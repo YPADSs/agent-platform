@@ -1,22 +1,24 @@
-import type { MetadataRoute } from 'next';
-import { locales } from '../i18n';
+import {type MetadataRoute} from 'next';
+import {locales} from '../i18n';
 
-const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+function baseUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+}
 
-const paths = ['/', '/recipes', '/articles', '/favorites', '/shopping-list', '/account'];
+const paths = ['', '/recipes', '/articles', '/favorites', '/shopping-list', '/planner', '/account', '/legal/privacy', '/legal/terms', '/legal/cookies', '/legal/disclaimer'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Locale is cookie-based (no prefix). We still emit alternates in sitemap via query param.
-  return paths.map((p) => {
-    const url = `${base}${p}`;
-    const alternates: Record<string, string> = {};
-    for (const l of locales) {
-      alternates[l] = `${url}?lang=${l}`;
+  const now = new Date();
+  const items: MetadataRoute.Sitemap = [];
+  for (const locale of locales) {
+    for (const p of paths) {
+      items.push({
+        url: `${baseUrl()}/${locale}${p}`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: p === '' ? 1 : 0.6
+      });
     }
-    return {
-      url,
-      lastModified: new Date(),
-      alternates: { languages: alternates },
-    };
-  });
+  }
+  return items;
 }
