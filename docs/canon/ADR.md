@@ -19,3 +19,12 @@ We will use **Netlify-only** hosting for:
 - All deployment documentation and CI/CD assumptions target Netlify.
 - Server-side enforcement for Premium gating must run via Netlify runtime/functions.
 - Any framework features unsupported by Netlify must have fallbacks or be avoided.
+
+---
+
+## Pending ADRs (not decided yet)
+> These are tracked here for visibility; they do **not** change scope without explicit approval.
+
+- Data store selection (SQL vs other) and hosting constraints under Netlify-only.
+ - Locale routing strategy (path prefix vs other) and SEO canonical policy for fallbacks.
+ - Observability strategy (logs/alerts) and webhook dead-letter handling.
