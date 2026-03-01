@@ -1,8 +1,17 @@
-export default function RecipeDetailPage({ params }: { params: { slug: string } }) {
+import { notFound } from 'next/navigation';
+import { getRecipe } from '@/lib/content';
+
+export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
+  const recipe = await getRecipe(params.slug);
+  if (!recipe) return notFound();
+
   return (
     <>
-      <h1>Recipe: {params.slug}</h1>
-      <p>Detail placeholder.</p>
+      <h1>{recipe.title}</h1>
+      <p><strong>Slug:</strong> {recipe.slug}</p>
+      <article>
+        <p>{recipe.body}</p>
+      </article>
     </>
   );
 }
