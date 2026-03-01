@@ -1,0 +1,10 @@
+{
+  "nav": {
+    "home": "Home",
+    "recipes": "Ricette",
+    "articles": "Articoli",
+    "favorites": "Preferiti",
+    "shoppingList": "Lista della spesa",
+    "account": "Account"
+  }
+}
