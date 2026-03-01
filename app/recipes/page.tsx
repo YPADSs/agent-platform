@@ -1,12 +1,30 @@
 import Link from 'next/link';
+import { listRecipes } from '@/lib/content';
 
-export default function RecipesPage() {
+export default async function RecipesPage({
+  searchParams,
+}: {
+  searchParams?: { q?: string };
+}) {
+  const q = searchParams?.q;
+  const recipes = await listRecipes(q);
+
   return (
     <>
       <h1>Recipes</h1>
-      <p>List placeholder. Search and filters will be added in later S1 issues.</p>
+      <form method="GET">
+        <label>
+          Search:{' '}
+          <input name="q" defaultValue={q || ''} />
+        </label>
+        <button type="submit">Go</button>
+      </form>
       <ul>
-        <li><Link href="/recipes/sample-recipe">Sample recipe</Link></li>
+        {recipes.map((r) => (
+          <li key={r.slug}>
+            <Link href={`/recipes/${r.slug}`}>{r.title}</Link>
+          </li>
+        ))}
       </ul>
     </>
   );
