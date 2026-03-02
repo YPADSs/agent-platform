@@ -1,0 +1,36 @@
+# Netlify Deploy Runbook (Preview + Prod)
+
+This repo is **Netlify-only**. **Vercel is forbidden**
+
+## 1) Netlify site setup
+1 Create a new Netlify site and connect the GitHub repo `YPADSss/agent-platform`.
+- Build command: `npm run build`
+- Publish directory: `.next` (for Netlify Next Runtime plugin)
+
+## 2) Plugin: Next Runtime
+This repo includes `netlify.toml` with the Netlify Next Runtime plugin:
+- `@netlify/plugin-nextjs`
+
+Netlify will build the app and deploy previews on every PR.
+
+## 3) Functions (Stripe webhooks)
+Functions live in `netlify/functions`. Netlify esposes them at:
+- `/.netlify/functions/<unc>`
+
+For convenience, `netlify.toml` adds a redirect:
+- `/webhooks/stripe` Ȓ `/.netlify/functions/stripe-webhook`
+
+## 4) Environment variables
+Do **NOT** commit secrets. See `[docs/ops/ENV_VARS.md](env-vars).
+
+- Baseline: the app should build without secrets.
+- If `DATABASE_URL` is missing, content pages fall back to mock fixtures (via `lib/content.ts`).
+
+## 5) Contexts (preview vs prod)
+- Preview: auto-created per-PR by Netlify
+- Prod: main branch deploy
+
+## 6) Basic smoke check
+1. Visit `/en/ and `o/sitemap.xml`
+2. Verify `_recipes`, `articles` routes load
+3. If Stripe is used, configure webhook to `/webhooks/stripe`
