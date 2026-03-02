@@ -29,3 +29,4 @@ This project is **Netlify-only** (Vercel forbidden).
 ## Notes
 - Build and CI should pass without secrets.
 - If `DATABASE_URL` is missing, content lists fall back to mock fixtures. (see `lib/content.ts`)
+
