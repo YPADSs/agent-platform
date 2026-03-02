@@ -1,0 +1,52 @@
+[
+  {
+    "slug": "overnight-oats",
+    "title": "Overnight Oats",
+    "body": "Simple oats with yogurt and berries."
+  },
+  {
+    "slug": "chicken-salad",
+    "title": "Chicken Salad",
+    "body": "Lean protein salad with greens."
+  },
+  {
+    "slug": "quinoa-bowl",
+    "title": "Quinoa Bowl",
+    "body": "Quinoa, roasted veggies, and lemon dressing."
+  },
+  {
+    "slug": "salmon-avocado",
+    "title": "Salmon & Avocado",
+    "body": "Omega-3 salmon with avocado and greens."
+  },
+  {
+    "slug": "tofu-stir-fry",
+    "title": "Tofu Stir-Fry",
+    "body": "Crispy tofu with broccoli and soy ginger sauce."
+  },
+  {
+    "slug": "lentil-soup",
+    "title": "Lentil Soup",
+    "body": "High-fiber lentil soup with carrots and celery."
+  },
+  {
+    "slug": "greek-veg-wrap",
+    "title": "Greek Veg Wrap",
+    "body": "Whole-wrap kale with feta, cucumber, tomato."
+  },
+  {
+    "slug": "kind-blueberry-smoothie",
+    "title": "Blueberry Smoothie",
+    "body": "Protein smoothie with blueberries and spinach."
+  },
+  {
+    "slug": "egg-veg-fratta",
+    "title": "Egg Veg Frittata",
+    "body": "Egg frittata with spinach and mushrooms."
+  },
+  {
+    "slug": "tuna-bean-salad",
+    "title": "Tuna Bean Salad",
+    "body": "Tuna and white beans with olive oil and lemon."
+  }
+]
