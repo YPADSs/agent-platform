@@ -8,3 +8,20 @@
 # Netlify Next Runtime
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Webhook routing (optional convenience path)
+[[redirects]]
+  from = "/webhooks/stripe"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+  force = true
+
+# Minimal security headers (applied to all pages)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Ref%errer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=()"
+    Cross-Origin-Opener-Policy = "same-origin"
