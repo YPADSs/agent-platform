@@ -14,7 +14,8 @@ function pickSupportedLocale(input: string | null): Locale {
 }
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  const loc = pickSupportedLocale((await requestLocale()) ?? null);
+  // Next-intl passes `requestLocale` as a Promise, not a function.
+  const loc = pickSupportedLocale((await requestLocale) ?? null);
 
   return {
     locale: loc,
