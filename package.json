@@ -10,7 +10,9 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "echo \"No tests yet\"",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed"
   },
   "dependencies": {
     "next": "14.2.5",
@@ -30,6 +32,10 @@
     "eslint-config-next": "14.2.5",
     "typescript": "5.5.3",
     "prisma": "5.18.0",
-    "@types/bcryptjs": "2.4.6"
+    "@types/bcryptjs": "2.4.6",
+    "ts-node": "10.9.2"
+  },
+  "prisma": {
+    "seed": "node --loader ts-node/esm prisma/seed.ts"
   }
 }
