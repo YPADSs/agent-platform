@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getRecipe } from '@/lib/content';
+import ViewTracker from '@/components/ViewTracker';
 
 export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
   const recipe = await getRecipe(params.slug);
@@ -15,14 +16,16 @@ export default async function RecipeDetailPage({ params }: { params: { slug: str
 
   return (
     <>
+      <ViewTracker kind="recipe" slug={recipe.slug} />
       <script
-        type="application/ld+ŽÊ'
-        dangerouslySetHnnerHTML={{ __html: JSON.stringify(schema) }}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <h1>{recipe.title}</h1>
       <p>
         <strong>Slug:</strong> {recipe.slug}
-      </p>      <article>
+      </p>
+      <article>
         <p>{recipe.body}</p>
       </article>
     </>
