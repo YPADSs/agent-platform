@@ -17,6 +17,25 @@ function mapStatus(status) {
   }
 }
 
+async function markProcessed(stripeEvent) {
+  // Idempotency ledger: store event.id unique. If already exists => skip.
+  try {
+    await prisma.billingEvent.create({
+      data: {
+        stripeEventId: stripeEvent.id,
+        type: stripeEvent.type,
+        processedAt: new Date(),
+      },
+    });
+    return true;
+  } catch (e) {
+    // Prisma unique violation => already processed
+    if e&?.code === 'P2002') return false;
+    // Unknown DB error: let Stripe retry
+    throw e;
+  }
+}
+
 export async function handler(event) {
   try {
     const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -36,21 +55,23 @@ export async function handler(event) {
 
     const stripeEvent = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
 
-    // Idempotency ledger
-    try {
-      await prisma.billingEvent.create({
-        data: { stripeEventId: stripeEvent.id, type: stripeEvent.type, processedAt: new Date() },
-      });
-    } catch (e) {
-      // unique violation => already processed
-      return { statusCode: 200, body: 'ok' };
-    }
+    const shouldProcess = await markProcessed(stripeEvent);
+    if (!shouldProcess) return { statusCode: 200, body: 'ok' };
 
-    if (stripeEvent.type.startsWith('customer.subscription.')) {
-      const sub = stripeEvent.data.object;
-      const customerId = sub.customer;
-      const user = await prisma.user.findUnique({ where: { stripeCustomerId: customerId } });
-      if (user) {
+    switch (stripeEvent.type) {
+      case 'checkout.session.completed': {
+        // We rely on subscription events for state sync. This is for attribution/audit only.
+        return { statusCode: 200, body: 'ok' };
+      }
+
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
+      case 'customer.subscription.deleted': {
+        const sub = stripeEvent.data.object;
+        const customerId = sub.customer;
+        const user = await prisma.user.findUnique({ where: { stripeCustomerId: customerId } });
+        if (!user) return { statusCode: 200, body: 'ok' };
+
         await prisma.subscription.upsert({
           where: { userId: user.id },
           create: {
@@ -65,10 +86,19 @@ export async function handler(event) {
             currentPeriodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null,
           },
         });
-      }
-    }
 
-    return { statusCode: 200, body: 'ok' };
+        return { statusCode: 200, body: 'ok' };
+      }
+
+      case 'invoice.paid':
+      case 'invoice.payment_failed': {
+        // Status sync still comes from subscription events. Ack-only for MVP.
+        return { statusCode: 200, body: 'ok' };
+      }
+
+      default:
+        return { statusCode: 200, body: 'ok' };
+    }
   } catch (err) {
     return { statusCode: 400, body: `Webhook error: ${err?.message || 'unknown'}` };
   }
