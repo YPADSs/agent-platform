@@ -7,9 +7,10 @@ This repo uses GitHub Actions CI to run:
 - `npm run build`
 
 ## Workflow name stability
-- Workflow: `CI 
+- Workflow: `CI`
 - Job: `build`
 - Required status check name: `CI / build`
+  - Note: GitHub UI may show `CI / build (pull_request)`; select `CI / build` in rulesets/branch protection.
 
 ## Enabling required status checks (manual)
 1. Repo → **Settings** → **Rules** → **Rulesets** (or Branch protection rules).
