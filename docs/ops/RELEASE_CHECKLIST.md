@@ -3,11 +3,11 @@
 This project is **Netlify-only**. **Vercel is forbidden**.
 
 ## CI / Quality
-- [ ] Required check `CI / build` is green
-- [ ] `npm ci && npm run build` passes locally
+- [ ] Required check `CI / build (pull_request)`  is green (required)
+- [ ] `npm install && npm run build` passes locally
 
 ## No secrets in repo
-- [ ] No `.env` committed (only `.env.example` / docs)
+- [ ] No `.env` committed (only `.env.example` or docs)
 - [ ] All credentials stored in Netlify site settings only
 
 ## Smoke (MVP)
