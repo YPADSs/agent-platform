@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { listRecipes } from '@/lib/content';
+import SearchForm from '@/components/SearchForm';
 
 export default async function RecipesPage({
   searchParams,
@@ -12,13 +13,7 @@ export default async function RecipesPage({
   return (
     <>
       <h1>Recipes</h1>
-      <form method="GET">
-        <label>
-          Search:{' '}
-          <input name="q" defaultValue={q || ''} />
-        </label>
-        <button type="submit">Go</button>
-      </form>
+      <SearchForm kind="recipes" defaultValue={q} />
       <ul>
         {recipes.map((r) => (
           <li key={r.slug}>
