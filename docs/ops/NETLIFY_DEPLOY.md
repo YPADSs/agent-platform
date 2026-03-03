@@ -34,3 +34,17 @@ Do **NOT** commit secrets. See `[docs/ops/ENV_VARS.md](env-vars).
 1. Visit `/en/ and `o/sitemap.xml`
 2. Verify `_recipes`, `articles` routes load
 3. If Stripe is used, configure webhook to `/webhooks/stripe`
+
+
+## 7) Troubleshooting: netlify.toml parse failures
+
+If Netlify fails early during **Initializing** with errors like:
+- `Failed to parse configuration`
+- `Invalid character, expected '='`
+
+Check `netlify.toml` for non-ASCII / “$typographic” characters in keys, especially in headers:
+- Use a plain ASCII hyphen `-` (not `–` / `‐` / non‑breaking hyphen)
+- Avoid smart quotes in keys
+
+Example of a valid header key:
+- `Referrer-Policy = "strict-origin-when-cross-origin"`

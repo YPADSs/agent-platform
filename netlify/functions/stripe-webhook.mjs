@@ -30,7 +30,7 @@ async function markProcessed(stripeEvent) {
     return true;
   } catch (e) {
     // Prisma unique violation => already processed
-    if e&?.code === 'P2002') return false;
+    if (e?.code === 'P2002') return false;
     // Unknown DB error: let Stripe retry
     throw e;
   }
