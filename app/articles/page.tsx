@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { listArticles } from '@/lib/content';
+import SearchForm from '@/components/SearchForm';
 
 export default async function ArticlesPage({
   searchParams,
@@ -12,13 +13,7 @@ export default async function ArticlesPage({
   return (
     <>
       <h1>Articles</h1>
-      <form method="GET">
-        <label>
-          Search:{' '}
-          <input name="q" defaultValue={q || ''} />
-        </label>
-        <button type="submit">Go</button>
-      </form>
+      <SearchForm kind="articles" defaultValue={q} />
       <ul>
         {articles.map((a) => (
           <li key={a.slug}>
