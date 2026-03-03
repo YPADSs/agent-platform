@@ -3,7 +3,9 @@
 This project is **Netlify-only**. **Vercel is forbidden**.
 
 ## CI / Quality
-- [ ] Required check `CI / build (pull_request)`  is green (required)
+- [ ] Required check `CI / build`  is green (required)
+  - Note: GitHub UI
+ may display it as `CI / build (pull_request)` depending on context; the required status check name to select is still `CI / build`.
 - [ ] `npm install && npm run build` passes locally
 
 ## No secrets in repo
