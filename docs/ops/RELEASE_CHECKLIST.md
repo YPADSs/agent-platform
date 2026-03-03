@@ -6,6 +6,8 @@ This project is **Netlify-only**. **Vercel is forbidden**.
 - [ ] Required check `CI / build`  is green (required)
   - Note: GitHub UI
  may display it as `CI / build (pull_request)` depending on context; the required status check name to select is still `CI / build`.
+- [ ] Required check `netlify/eat-platforms/deploy-preview` is green (recommended)
+  - Note: `eat-platforms` is the Netlify site name; check name changes if site is renamed.
 - [ ] `npm install && npm run build` passes locally
 
 ## No secrets in repo
