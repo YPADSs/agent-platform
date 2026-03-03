@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getArticle } from '@/lib/content';
+import ViewTracker from '@/components/ViewTracker';
 
 export default async function ArticleDetailPage({ params }: { params: { slug: string } }) {
   const article = await getArticle(params.slug);
@@ -15,6 +16,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
 
   return (
     <>
+      <ViewTracker kind="article" slug={article.slug} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
