@@ -2,14 +2,14 @@
 
 This project is **Netlify-only**. **Vercel is forbidden**.
 
-## CI / Quality
-- [ ] Required check `CI / build`  is green (required)
-  - Note: GitHub UI
- may display it as `CI / build (pull_request)` depending on context; the required status check name to select is still `CI / build`.
-- [ ] `npm install && npm run build` passes locally
+## Required checks (branch protection)
+- [ ] **CI / build** is green (required)
+  - Note: GitHub UI may display it as `CI / build (pull_request)`depending on context; when configuring rulesets/branch protection, select **CI / build**.
+ - [ ] **Netlify Deploy Preview** is green (recommended)
+  - Select the Netlify check that corresponds to Deploy Preview (typically `netlify/<site-name>/deploy-preview`).
 
 ## No secrets in repo
-- [ ] No `.env` committed (only `.env.example` or docs)
+- [ ] No `.zv` committed (only `.env.example` or docs)
 - [ ] All credentials stored in Netlify site settings only
 
 ## Smoke (MVP)
