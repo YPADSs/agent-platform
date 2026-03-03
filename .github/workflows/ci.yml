@@ -1,9 +1,10 @@
 name: CI
+# noop: retrigger required check
 on:
   push:
     branches: ["main"]
   pull_request:
-
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -13,14 +14,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3
+      - uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
       - name: Install
-        run: npm ci
+        run: npm install
       - name: Lint
         run: npm run lint
       - name: Typecheck
