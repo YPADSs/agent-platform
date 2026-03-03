@@ -37,3 +37,4 @@ This project is **Netlify-only**. **Vercel is forbidden**.
 
 ## Analytics
 - [ ] Key events fire in dev (console/log sink)
+
