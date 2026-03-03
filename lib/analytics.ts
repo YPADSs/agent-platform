@@ -1,0 +1,34 @@
+export type AnalyticsEventName =
+  | 'page_view'
+  | 'search_performed'
+  | 'content_viewed'
+  | 'checkout_started'
+
+export type AnalyticsEvent = {
+  name: AnalyticsEventName;
+  ts: number;
+  props?: Record<string, unknown>;
+};
+
+function sanitizeProps(props: Record<string, unknown> = {}) {
+  // Privacy-safe: drop potential PII fields if passed by mistake.
+  const { query, email, name, ...rest } = props as any;
+  return rest;
+}
+
+export async function track(event: AnalyticsEvent) {
+  try {
+    await fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        name: event.name,
+        ts: event.ts,
+        props: sanitizeProps(event.props),
+      }),
+    });
+  } catch {
+    // no-op
+  }
+}
