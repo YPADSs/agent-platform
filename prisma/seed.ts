@@ -1,21 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 
+import recipesFromFile from './fixtures/recipes.json' assert { type: 'json' };
+import articlesFromFile from './fixtures/articles.json' assert { type: 'json' };
+
 const prisma = new PrismaClient();
 
 type FixtureItem = { slug: string; title: string; body: string };
 
-const recipes: FixtureItem[] = [
-  { slug: 'overnight-oats', title: 'Overnight Oats', body: 'Simple oats with yogurt and berries.' },
-  { slug: 'chicken-salad', title: 'Chicken Salad', body: 'Lean protein salad with greens.' }
-];
-
-const articles: FixtureItem[] = [
-  { slug: 'why-protein-matters', title: 'Why Protein Matters', body: 'Protein supports muscle and satiety.' },
-  { slug: 'hydration-basics', title: 'Hydration Basics', body: 'Water intake tips for everyday life.' }
-];
+const recipes = recipesFromFile as FixtureItem[];
+const articles = articlesFromFile as FixtureItem[];
 
 async function main() {
-  // NOTE: Keep seed minimal for S2-002. S2-005 will expand to >=10/10.
   await prisma.recipe.createMany({ data: recipes, skipDuplicates: true });
   await prisma.article.createMany({ data: articles, skipDuplicates: true });
 }
