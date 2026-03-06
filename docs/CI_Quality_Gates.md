@@ -1,6 +1,8 @@
 # CI + Quality Gates (Sprint 1–2)
 
 This repo uses GitHub Actions CI to run:
+- `node scripts/ci-policy-guards.mjs` (prevents committing forbidden files like `.env` / Vercel artifacts; ensures `.env.example` has no values)
+- `node scripts/validate-netlify-config.mjs` (guards against Netlify deploy failures)
 - `npm run lint`
 - `npm run typecheck`
 - `npm test`
@@ -9,15 +11,15 @@ This repo uses GitHub Actions CI to run:
 ## Workflow name stability
 - Workflow: `CI`
 - Job: `build`
-- Required status check name: `CI / build`
-  - Note: GitHub UI may show `CI / build (pull_request)`; select `CI / build` in rulesets/branch protection.
+- Required status check name (rulesets/branch protection): `build`
+  - Note: GitHub may display it as `CI / build` (and sometimes append `(pull_request)`), but in rulesets you must select the exact check name from the "Add checks" dropdown (currently `build`).
 
 ## Enabling required status checks (manual)
 1. Repo ₒ **Settings** → **Rules** → **Rulesets** (or Branch protection rules).
 2. Create/enable a ruleset for `main`.
-2. Require status checks:
-   - `CI / build`
-3. (Optional) Require PRS, squash merge, and linear history.
+3. Require status checks:
+   - `build`
+4. (Optional) Require PRs, squash merge, and linear history.
 
 > Note: No secrets are required for CI runs. Store sensitive values in GitHub Secrets and only reference env variable names in repo.
 
