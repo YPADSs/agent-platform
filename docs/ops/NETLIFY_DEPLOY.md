@@ -44,6 +44,16 @@ Do **NOT** commit secrets. See [docs/ops/ENV_VARS.md](env-vars).
 3. If Stripe is used, configure webhook to `/webhooks/stripe`
 
 
+## 6.5) Recommended PR gates (GitHub rulesets / branch protection)
+To avoid merging changes that pass CI but fail on Netlify, require these checks on `main`:
+
+- `CI / build`
+- `netlify/eat-platforms/deploy-preview` (Netlify Deploy Preview)
+
+Notes:
+- GitHub UI sometimes appends context suffixes; select the exact check name shown above.
+- The `eat-platforms` segment is the Netlify **site name** and will change if the site is renamed.
+
 ## 7) Troubleshooting: netlify.toml parse failures
 
 If Netlify fails early during **Initializing** with errors like:
