@@ -2,12 +2,14 @@
 
 This project is **Netlify-only**. **Vercel is forbidden**.
 
-## CI / Quality
-- [ ] Required check `CI / build (pull_request)`  is green (required)
-- [ ] `npm install && npm run build` passes locally
+## Required checks (branch protection / rulesets)
+- [ ] **build** is green (required)
+  - Note: GitHub may group this under the workflow `CI` and display `CI / build` (and sometimes append `(pull_request)`), but in rulesets select the exact check name shown in the “Add checks” dropdown (currently `build`).
+- [ ] **Netlify Deploy Preview** is green (required)
+  - Select: `netlify/eat-platforms/deploy-preview`
 
 ## No secrets in repo
-- [ ] No `.env` committed (only `.env.example` or docs)
+- [ ] No `.zv` committed (only `.env.example` or docs)
 - [ ] All credentials stored in Netlify site settings only
 
 ## Smoke (MVP)
@@ -37,4 +39,3 @@ This project is **Netlify-only**. **Vercel is forbidden**.
 
 ## Analytics
 - [ ] Key events fire in dev (console/log sink)
-
