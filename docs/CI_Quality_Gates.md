@@ -1,6 +1,7 @@
 # CI + Quality Gates (Sprint 1)
 
 This repo uses GitHub Actions CI to run:
+- `node scripts/validate-netlify-config.mjs` (guards against Netlify deploy failures)
 - `npm run lint`
 - `npm run typecheck`
 - `npm test`
@@ -10,7 +11,7 @@ This repo uses GitHub Actions CI to run:
 - Workflow: `CI`
 - Job: `build`
 - Required status check name (rulesets/branch protection): `build`
-  - Note: GitHub may display it as `CI / build` (and sometimes append `(pull_request)`), but in rulesets you must select the exact check name from the "Add checks" dropdown (currently `build`).
+  - Note: GitHub may display it as `CI / build` (and sometimes append `(pull_request)`i), but in rulesets you must select the exact check name from the "Add checks" dropdown (currently `build`).
 
 ## Enabling required status checks (manual)
 1. Repo → **Settings** → **Rules** → **Rulesets** (or Branch protection rules).
