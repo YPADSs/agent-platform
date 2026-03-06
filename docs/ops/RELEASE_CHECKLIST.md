@@ -2,11 +2,11 @@
 
 This project is **Netlify-only**. **Vercel is forbidden**.
 
-## Required checks (branch protection)
-- [ ] **CI / build** is green (required)
-  - Note: GitHub UI may display it as `CI / build (pull_request)`depending on context; when configuring rulesets/branch protection, select **CI / build**.
- - [ ] **Netlify Deploy Preview** is green (recommended)
-  - Select the Netlify check that corresponds to Deploy Preview (typically `netlify/<site-name>/deploy-preview`).
+## Required checks (branch protection / rulesets)
+- [ ] **build** is green (required)
+  - Note: GitHub may group this under the workflow `CI` and display `CI / build` (and sometimes append `(pull_request)`), but in rulesets select the exact check name shown in the “Add checks” dropdown (currently `build`).
+- [ ] **Netlify Deploy Preview** is green (required)
+  - Select: `netlify/eat-platforms/deploy-preview`
 
 ## No secrets in repo
 - [ ] No `.zv` committed (only `.env.example` or docs)
