@@ -3,11 +3,12 @@
 
 This repo is **Netlify-only**. **Vercel is forbidden**.
 
-## 0) Recommended required checks (GitHub rulesets / branch protection)
-- Required: **CI / build**
-- Recommended: **Netlify Deploy Preview**
-  - In GitHub checks, this usually looks like `netlify/<site-name>/deploy-preview`.
-  - Optional/secondary Netlify checks (these usually follow Deploy Preview): `Header rules`, `Redirect rules`, `Pages changed`.
+## 0) Required status checks (GitHub rulesets / branch protection)
+- Required: **build** (GitHub Actions job under workflow `CI`)
+- Required: **Netlify Deploy Preview**
+  - Select: `netlify/eat-platforms/deploy-preview`
+- Optional/secondary Netlify checks (these usually follow Deploy Preview): `Header rules`, `Redirect rules`, `Pages changed`.
+
 
 ## 1) Netlify site setup
 1. Create a new Netlify site and connect the GitHub repo `YPADSs/agent-platform`.
