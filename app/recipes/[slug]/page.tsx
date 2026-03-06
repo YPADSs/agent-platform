@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getRecipe } from '@/lib/content';
 import ViewTracker from '@/components/ViewTracker';
+import FavoriteButton from '@/components/FavoriteButton';
 
 export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
   const recipe = await getRecipe(params.slug);
@@ -22,6 +23,7 @@ export default async function RecipeDetailPage({ params }: { params: { slug: str
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <h1>{recipe.title}</h1>
+      <FavoriteButton targetType="RECIPE" targetSlug={recipe.slug} />
       <p>
         <strong>Slug:</strong> {recipe.slug}
       </p>
