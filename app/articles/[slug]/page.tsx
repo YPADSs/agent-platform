@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getArticle } from '@/lib/content';
 import ViewTracker from '@/components/ViewTracker';
+import FavoriteButton from '@/components/FavoriteButton';
 
 export default async function ArticleDetailPage({ params }: { params: { slug: string } }) {
   const article = await getArticle(params.slug);
@@ -22,6 +23,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <h1>{article.title}</h1>
+      <FavoriteButton targetType="ARTICLE" targetSlug={article.slug} />
       <p>
         <strong>Slug:</strong> {article.slug}
       </p>
