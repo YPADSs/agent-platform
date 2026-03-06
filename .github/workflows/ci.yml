@@ -19,6 +19,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: CI policy guards
+        run: node scripts/ci-policy-guards.mjs
       - name: Validate Netlify config
         run: node scripts/validate-netlify-config.mjs
       - name: Install
