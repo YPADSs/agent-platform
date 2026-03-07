@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import {useEffect, useState, type FormEvent} from 'react';
 
-type Item = { id: string; text: string; pantry: boolean };
+type Item = {id: string; text: string; pantry: boolean};
 
 export default function ShoppingListPage() {
   const [items, setItems] = useState<Item[]>([]);
@@ -29,15 +29,15 @@ export default function ShoppingListPage() {
 
   useEffect(() => {
     setLinkReady(true);
-    load();
+    void load();
   }, []);
 
-  async function addItem(e: React.FormEvent) {
+  async function addItem(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const res = await fetch('/api/shopping-list', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text }),
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({text})
     });
     if (!res.ok) {
       setErr('Failed to add item (are you logged in?).');
@@ -50,8 +50,8 @@ export default function ShoppingListPage() {
   async function toggle(item: Item) {
     await fetch('/api/shopping-list', {
       method: 'PATCH',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ id: item.id, pantry: !item.pantry }),
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({id: item.id, pantry: !item.pantry})
     });
     await load();
   }
@@ -59,8 +59,8 @@ export default function ShoppingListPage() {
   async function remove(item: Item) {
     await fetch('/api/shopping-list', {
       method: 'DELETE',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ id: item.id }),
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({id: item.id})
     });
     await load();
   }
@@ -71,7 +71,10 @@ export default function ShoppingListPage() {
     <div className="recipesPage">
       <div className="pageIntro">
         <h1>Shopping list</h1>
-        <p>Add ingredients from recipes or type items manually. Mark items as already at home with the pantry toggle.</p>
+        <p>
+          Add ingredients from recipes or type items manually. Mark items as already at home with the
+          pantry toggle.
+        </p>
       </div>
 
       {err ? (
@@ -79,8 +82,9 @@ export default function ShoppingListPage() {
           <p>{err}</p>
           {linkReady ? (
             <p>
-              <Link href="/account/login">Log in</Link> {' '}or <Link href="/account/register">create an account</Link>
-              to save your shopping list.
+              <Link href="/account/login">Log in</Link>{' '}or{' '}
+              <Link href="/account/register">create an account</Link>
+              {' '}to save your shopping list.
             </p>
           ) : null}
         </div>
@@ -97,7 +101,9 @@ export default function ShoppingListPage() {
           </form>
 
           <p className="resultsMeta">
-            {loading ? 'Loading shopping list...' : `${items.length} item${items.length === 1 ? '' : 's'} • ${pantryCount} at home`}
+            {loading
+              ? 'Loading shopping list...'
+              : `${items.length} item${items.length === 1 ? '' : 's'} • ${pantryCount} at home`}
           </p>
 
           {items.length ? (
@@ -105,17 +111,17 @@ export default function ShoppingListPage() {
               {items.map((item) => (
                 <li key={item.id} className="recipeCard">
                   <div className="recipeCardHeader">
-                    <p className="badg">{item.pantry ? 'In pantry' : 'Need to buy'}</p>
+                    <p className="badge">{item.pantry ? 'In pantry' : 'Need to buy'}</p>
                   </div>
                   <p>{item.text}</p>
                   <div className="filterActions">
                     <button type="button" onClick={() => toggle(item)}>
-                      {item.pantry ? "Mark as need  to buy" : "Mark as at home"}
+                      {item.pantry ? 'Mark as need to buy' : 'Mark as at home'}
                     </button>
                     <button type="button" onClick={() => remove(item)}>Remove</button>
                   </div>
                 </li>
-             "))}
+              ))}
             </ul>
           ) : (
             <div className="emptyState">
