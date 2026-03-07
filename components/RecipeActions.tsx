@@ -1,21 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-import { track } from '@/lib/analytics';
+import {useState} from 'react';
+import {track} from '@/lib/analytics';
 
 type RecipeActionsProps = {
   slug: string;
   servings: number;
 };
 
-export default function RecipeActions({ slug, servings }: RecipeActionsProps) {
+export default function RecipeActions({slug, servings}: RecipeActionsProps) {
   const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);  const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
 
   async function runAction(
     type: 'favorite' | 'shopping-list',
     url: string,
-    options?: RequestInit,
+    options?: RequestInit
   ) {
     setError(null);
     setMessage(null);
@@ -39,14 +40,14 @@ export default function RecipeActions({ slug, servings }: RecipeActionsProps) {
         void track({
           name: 'content_viewed',
           ts: Date.now(),
-          props: { kind: 'recipe', action: 'favorite', slug },
+          props: {kind: 'recipe', action: 'favorite', slug}
         });
       } else {
         setMessage(`Added ${data.added ?? 'some'} items to shopping list.`);
         void track({
           name: 'content_viewed',
           ts: Date.now(),
-          props: { kind: 'recipe', action: 'shopping_list', aslug: slug },
+          props: {kind: 'recipe', action: 'shopping_list', slug}
         });
       }
     } catch {
@@ -62,7 +63,7 @@ export default function RecipeActions({ slug, servings }: RecipeActionsProps) {
         <button
           type="button"
           onClick={() =>
-            runAction('favorite', `/api/recipes/${slug}/favorite`, { method: 'POST' })
+            runAction('favorite', `/api/recipes/${slug}/favorite`, {method: 'POST'})
           }
           disabled={pendingAction !== null}
         >
@@ -76,9 +77,9 @@ export default function RecipeActions({ slug, servings }: RecipeActionsProps) {
               `/api/recipes/${slug}/shopping-list`,
               {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ servings }),
-              },
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({servings})
+              }
             )
           }
           disabled={pendingAction !== null}
