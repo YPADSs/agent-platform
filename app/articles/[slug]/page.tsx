@@ -1,9 +1,10 @@
-import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import {notFound} from 'next/navigation';
 import ViewTracker from '@/components/ViewTracker';
 import ArticleActions from '@/components/ArticleActions';
-import { getArticleDetail } from '@/lib/articles';
+import {getArticleDetail} from '@/lib/articles';
 
-export default async function ArticleDetailPage({ params }: { params: { slug: string } }) {
+export default async function ArticleDetailPage({params}: {params: {slug: string}}) {
   const article = await getArticleDetail(params.slug);
   if (!article) return notFound();
 
@@ -12,7 +13,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
     '@type': 'Article',
     headline: article.title,
     articleBody: article.body,
-    url: `/articles/${article.slug}`,
+    url: `/articles/${article.slug}`
   };
 
   return (
@@ -20,7 +21,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
       <ViewTracker kind="article" slug={article.slug} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{__html: JSON.stringify(schema)}}
       />
       <article className="recipeDetail">
         <header className="recipeHero">
@@ -62,9 +63,9 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
             <ul className="ingredientList">
               {article.related.length ? article.related.map((item) => (
                 <li key={`${item.kind}-${item.slug}`}>
-                  <a href={item.kind === 'recipe' ? `/recipes/${item.slug}` : `/articles/${item.slug}`}>
+                  <Link href={item.kind === 'recipe' ? `/recipes/${item.slug}` : `/articles/${item.slug}`}>
                     {item.title}
-                  </a>
+                  </Link>
                   <small className="muted">{item.kind}</small>
                 </li>
               )) : <li>No related content available.</li>}
