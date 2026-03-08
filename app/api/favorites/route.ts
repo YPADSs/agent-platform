@@ -1,15 +1,19 @@
-
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/current-user';
 import { getPrisma } from '@/lib/prisma';
 import {
   favoriteTargetExists,
   getFavoriteTargetSummary,
-  type FavoriteTargetType,
+  type FavoriteTargetType
 } from '@/lib/favorites';
 
-function asType(v: unknown): FavoriteTargetType | null {
-  if (v === 'RECIPE' || v === 'ARTICLE') return v;
+type FavoritesRequestBody = {
+  targetType?: unknown;
+  targetSlug?: unknown;
+};
+
+function asType(value: unknown): FavoriteTargetType | null {
+  if (value === 'RECIPE' || value === 'ARTICLE') return value;
   return null;
 }
 
@@ -23,7 +27,7 @@ export async function GET() {
   const favorites = await prisma.favorite.findMany({
     where: { userId: currentUser.userId },
     orderBy: { createdAt: 'desc' },
-    select: { targetType: true, targetSlug: true, creatdAt: true },
+    select: { targetType: true, targetSlug: true, creatdAt: true }
   });
 
   const enriched = await Promise.all(
@@ -31,13 +35,13 @@ export async function GET() {
       const target = await getFavoriteTargetSummary(favorite.targetType, favorite.targetSlug);
       return {
         ...favorite,
-        target,
+        target
       };
-    }),
+    })
   );
 
   return NextResponse.json({
-    favorites: enriched.filter((favorite) => favorite.target !== null),
+    favorites: enriched.filter((favorite) => favorite.target !== null)
   });
 }
 
@@ -48,9 +52,9 @@ export async function POST(req: Request) {
   }
 
   const prisma = getPrisma();
-  const body = await req.json();
-  const targetType = asType(body?.targetType);
-  const targetSlug = typeof body?.targetSlug === 'string' ? body.targetSlug.trim() : null;
+  const body: FavoritesRequestBody = await req.json();
+  const targetType = asType(body.targetType);
+  const targetSlug = typeof body.targetSlug === 'string' ? body.targetSlug.trim() : null;
 
   if (!targetType || !targetSlug) {
     return NextResponse.json({ error: 'BAD_REQUEST' }, { status: 400 });
@@ -66,11 +70,11 @@ export async function POST(req: Request) {
       userId_targetType_targetSlug: {
         userId: currentUser.userId,
         targetType,
-        targetSlug,
-      },
+        targetSlug
+      }
     },
     create: { userId: currentUser.userId, targetType, targetSlug },
-    update: {},
+    update: {}
   });
 
   const target = await getFavoriteTargetSummary(targetType, targetSlug);
@@ -85,16 +89,16 @@ export async function DELETE(req: Request) {
   }
 
   const prisma = getPrisma();
-  const body = await req.json();
-  const targetType = asType(body?.targetType);
-  const targetSlug = typeof body?.targetSlug === 'string' ? body.targetSlug.trim() : null;
+  const body: FavoritesRequestBody = await req.json();
+  const targetType = asType(body.targetType);
+  const targetSlug = typeof body.targetSlug === 'string' ? body.targetSlug.trim() : null;
 
   if (!targetType || !targetSlug) {
     return NextResponse.json({ error: 'BAD_REQUEST' }, { status: 400 });
   }
 
   await prisma.favorite.deleteMany({
-    where: { userId: currentUser.userId, targetType, targetSlug },
+    where: { userId: currentUser.userId, targetType, targetSlug }
   });
 
   return NextResponse.json({ ok: true, targetType, targetSlug });
