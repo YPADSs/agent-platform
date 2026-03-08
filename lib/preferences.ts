@@ -1,3 +1,4 @@
+// CI retrigger commit for #120
 import { getPrisma } from '@/lib/prisma';
 
 export const SUPPORTED_LOCALES = ['en', 'fr', 'de', 'es', 'it'] as const;
