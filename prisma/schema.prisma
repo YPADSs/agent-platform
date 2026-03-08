@@ -19,6 +19,13 @@ enum SubscriptionStatus {
   CANCELED
 }
 
+enum MealSlot {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
 model User {
   id            String  @id @default(cuid())
   email         String  @unique
@@ -29,6 +36,7 @@ model User {
   stripeCustomerId String? @unique
 
   subscription   Subscription?
+  mealPlans      MealPlan[]
 
   favorites      Favorite[]
   shoppingItems  ShoppingListItem[]
@@ -58,12 +66,12 @@ model BillingEvent {
   processedAt   DateTime?
 }
 
-
 model Recipe {
   id        String   @id @default(cuid())
   slug      String   @unique
   title     String
   body      String
+  mealPlanItems MealPlanItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -76,7 +84,6 @@ model Article {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 
 enum FavoriteTargetType {
   RECIPE
@@ -106,4 +113,34 @@ model ShoppingListItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model MealPlan {
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStartDate DateTime
+  items         MealPlanItem[]
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([userId, weekStartDate])
+}
+
+model MealPlanItem {
+  id          String    @id @default(cuid())
+  mealPlanId  String
+  mealPlan    MealPlan  @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  planDate    DateTime
+  slot        MealSlot
+  slotIndex   Int       @default(1)
+  recipeId    String
+  recipe      Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  servings    Int       @default(1)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([mealPlanId, planDate, slot, slotIndex])
 }
