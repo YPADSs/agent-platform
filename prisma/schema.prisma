@@ -19,6 +19,26 @@ enum SubscriptionStatus {
   CANCELED
 }
 
+enum Locale {
+  EN
+  FR
+  DE
+  ES
+  IT
+}
+
+enum UnitSystem {
+  METRIC
+  IMPERIAL
+}
+
+enum OnboardingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
 model User {
   id            String  @id @default(cuid())
   email         String  @unique
@@ -29,25 +49,41 @@ model User {
   stripeCustomerId String? @unique
 
   subscription   Subscription?
+  preferences    UserPreferences?
 
   favorites      Favorite[]
   shoppingItems  ShoppingListItem[]
 
   createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  updatedAt    DateTime @updatedAt
+}
+
+model UserPreferences {
+  id                    String           @id @default(cuid())
+  userId                 String           @unique
+  user                   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  goalCode                String?
+  locale                 Locale           @default(EN)
+  unitSystem             UnitSystem       @default(METRIC)
+  onboardingStatus       OnboardingStatus @default(NOT_STARTED)
+  onboardingCompletedAt DateTime?
+
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
 }
 
 model Subscription {
   id                   String             @id @default(cuid())
   userId               String             @unique
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   stripeSubscriptionId String?            @unique
   status               SubscriptionStatus @default(INACTIVE)
   currentPeriodEnd     DateTime?
 
   createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  updatedAt             DateTime           @updatedAt
 }
 
 model BillingEvent {
@@ -60,8 +96,8 @@ model BillingEvent {
 
 
 model Recipe {
-  id        String   @id @default(cuid())
-  slug      String   @unique
+  id        String  @id @default(cuid())
+  slug      String  @unique
   title     String
   body      String
   createdAt DateTime @default(now())
@@ -69,8 +105,8 @@ model Recipe {
 }
 
 model Article {
-  id        String   @id @default(cuid())
-  slug      String   @unique
+  id        String  @id @default(cuid())
+  slug      String  @unique
   title     String
   body      String
   createdAt DateTime @default(now())
@@ -84,9 +120,9 @@ enum FavoriteTargetType {
 }
 
 model Favorite {
-  id         String             @id @default(cuid())
+  id         String              @id @default(cuid())
   userId     String
-  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   targetType FavoriteTargetType
   targetSlug String
@@ -97,7 +133,7 @@ model Favorite {
 }
 
 model ShoppingListItem {
-  id        String   @id @default(cuid())
+  id       String  @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
