@@ -1,11 +1,11 @@
-import { notFound } from 'next/navigation';
+import {notFound} from 'next/navigation';
 import ViewTracker from '@/components/ViewTracker';
 import RecipeActions from '@/components/RecipeActions';
-import { getRecipeDetail } from '@/lib/recipes';
+import {getRecipeDetail} from '@/lib/recipes';
 
 type RecipeDetailPageProps = {
-  params: { slug: string };
-  searchParams?: { servings?: string };
+  params: {slug: string};
+  searchParams?: {servings?: string};
 };
 
 function parseServings(value?: string): number | undefined {
@@ -19,7 +19,7 @@ function parseServings(value?: string): number | undefined {
 
 export default async function RecipeDetailPage({
   params,
-  searchParams,
+  searchParams
 }: RecipeDetailPageProps) {
   const servings = parseServings(searchParams?.servings);
   const recipe = await getRecipeDetail(params.slug, servings);
@@ -31,7 +31,7 @@ export default async function RecipeDetailPage({
     '@type': 'Recipe',
     name: recipe.title,
     description: recipe.description,
-    url: `/recipes/${recipe.slug}`,
+    url: `/recipes/${recipe.slug}`
   };
 
   return (
@@ -39,7 +39,7 @@ export default async function RecipeDetailPage({
       <ViewTracker kind="recipe" slug={recipe.slug} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{__html: JSON.stringify(schema)}}
       />
       <article className="recipeDetail">
         <header className="recipeHero">
@@ -72,7 +72,7 @@ export default async function RecipeDetailPage({
           </section>
 
           <section className="panel">
-            <h2>Servings & scaling</h2>
+            <h2>Servings &amp; scaling</h2>
             <p className="muted">
               The ingredient quantities below are scaled to {recipe.servings} serving
               {recipe.servings === 1 ? '' : 's'}.
@@ -105,7 +105,7 @@ export default async function RecipeDetailPage({
                   <span>{ingredient.text}</span>
                   {!ingredient.scalable ? <small>Fixed amount</small> : null}
                 </li>
-              )J}
+              ))}
             </ul>
           </section>
 
