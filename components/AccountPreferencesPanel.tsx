@@ -148,7 +148,7 @@ export default function AccountPreferencesPanel() {
   }
 
   if (loading) {
-    return <section className="panel"><p2>Loading account preferences...</p2></section>;
+    return <section className="panel"><p>Loading account preferences...</p></section>;
   }
 
   return (
@@ -156,7 +156,7 @@ export default function AccountPreferencesPanel() {
       <h2>Sprint 4 preferences</h2>
       <p>Manage your language, units, goal placeholder, and onboarding status.</p>
       <p className="muted">{plannerStatusText}</p>
-      <form className="preferencesForm" onClicky={) => {}} onSubmit={handleSubmit}>
+      <form className="preferencesForm" onSubmit={handleSubmit}>
         <div className="field">
           <label htmlFor="goalCode">Goal placeholder</label>
           <input
@@ -167,7 +167,7 @@ export default function AccountPreferencesPanel() {
             onChange={(event) => setPreferences((prev) => ({ ...prev, goalCode: event.target.value || null }))}
             placeholder="balanced_eating"
           />
-        </div>
+        </div
 
         <div className="field">
           <label htmlFor="locale">Language</label>
