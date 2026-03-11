@@ -148,7 +148,11 @@ export default function AccountPreferencesPanel() {
   }
 
   if (loading) {
-    return <section className="panel"><p>Loading account preferences...</p></section>;
+    return (
+      <section className="panel">
+        <p>Loading account preferences...</p>
+      </section>
+    );
   }
 
   return (
@@ -156,6 +160,7 @@ export default function AccountPreferencesPanel() {
       <h2>Sprint 4 preferences</h2>
       <p>Manage your language, units, goal placeholder, and onboarding status.</p>
       <p className="muted">{plannerStatusText}</p>
+
       <form className="preferencesForm" onSubmit={handleSubmit}>
         <div className="field">
           <label htmlFor="goalCode">Goal placeholder</label>
@@ -164,10 +169,15 @@ export default function AccountPreferencesPanel() {
             name="goalCode"
             type="text"
             value={preferences.goalCode ?? ''}
-            onChange={(event) => setPreferences((prev) => ({ ...prev, goalCode: event.target.value || null }))}
+            onChange={(event) =>
+              setPreferences((prev) => ({
+                ...prev,
+                goalCode: event.target.value || null,
+              }))
+            }
             placeholder="balanced_eating"
           />
-        </div
+        </div>
 
         <div className="field">
           <label htmlFor="locale">Language</label>
@@ -175,7 +185,12 @@ export default function AccountPreferencesPanel() {
             id="locale"
             name="locale"
             value={preferences.locale}
-            onChange={(event) => setPreferences((prev) => ({ ...prev, locale: event.target.value }))}
+            onChange={(event) =>
+              setPreferences((prev) => ({
+                ...prev,
+                locale: event.target.value,
+              }))
+            }
           >
             {LOCALE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -191,7 +206,12 @@ export default function AccountPreferencesPanel() {
             id="unitSystem"
             name="unitSystem"
             value={preferences.unitSystem}
-            onChange={(event) => setPreferences((prev) => ({ ...prev, unitSystem: event.target.value }))}
+            onChange={(event) =>
+              setPreferences((prev) => ({
+                ...prev,
+                unitSystem: event.target.value,
+              }))
+            }
           >
             {UNIT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -207,7 +227,12 @@ export default function AccountPreferencesPanel() {
             id="onboardingStatus"
             name="onboardingStatus"
             value={preferences.onboardingStatus}
-            onChange={(event) => setPreferences((prev) => ({ ...prev, onboardingStatus: event.target.value }))}
+            onChange={(event) =>
+              setPreferences((prev) => ({
+                ...prev,
+                onboardingStatus: event.target.value,
+              }))
+            }
           >
             {ONBOARDING_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -222,10 +247,13 @@ export default function AccountPreferencesPanel() {
             {saving ? 'Saving...' : 'Save preferences'}
           </button>
           {preferences.onboardingCompletedAt ? (
-            <p className="muted">Completed on {new Date(preferences.onboardingCompletedAt).toLocaleDateString()}</p>
+            <p className="muted">
+              Completed on {new Date(preferences.onboardingCompletedAt).toLocaleDateString()}
+            </p>
           ) : null}
         </div>
       </form>
+
       {liveStatus ? <p className="statusMessage">{liveStatus}</p> : null}
       {error ? <p className="statusError">{error}</p> : null}
     </section>
