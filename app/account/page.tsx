@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/session';
 import { getAccountStatusByEmail } from '@/lib/billing';
+import AccountPreferencesPanel from '@/components/AccountPreferencesPanel';
 
 export default async function AccountPage() {
   try {
@@ -19,7 +20,7 @@ export default async function AccountPage() {
             <p>Create an account to save favorites, build a shopping list, and manage Premium.</p>
             <div className="filterActions">
               <Link href="/account/login">Log in</Link>
-              <Link href="/account/register">Create account</Link>
+              <Link href="/account/register">Create an account</Link>
             </div>
           </div>
         </div>
@@ -60,22 +61,24 @@ export default async function AccountPage() {
             ) : null}
           </section>
 
+          <AccountPreferencesPanel />
+        </div>
+
+        <div className="recipeColumns">
           <section className="panel">
             <h2>MVP tools</h2>
             <ul className="ingredientList">
               <li><Link href="/favorites">Open favorites</Link></li>
               <li><Link href="/shopping-list">Open shopping list</Link></li>
               <li>
-                <Link href="/planner">Open meal planner</Link>{' '}<small className="muted">Premium-gated MVP placeholder.</small>
+                <Link href="/planner">Open meal planner</Link>{' '}<small className="muted">Premium-gated STRINT 4 entry point.</small>
               </li>
             </ul>
           </section>
-        </div>
 
-        <div className="recipeColumns">
           <section className="panel">
             <h2>Premium access</h2>
-            <p>Premium unlocks meal planner access and other paywalled MVP entry points.</p>
+            <p>Premium unlocks meal planner access and other paywalled Sprint 4 entry points.</p>
             <div className="filterActions">
               {showCheckout ? (
                 <form action="/api/billing/checkout" method="POST">
@@ -89,15 +92,6 @@ export default async function AccountPage() {
               </form>
             </div>
           </section>
-
-          <section className="panel">
-            <h2>Paywall entry points</h2>
-            <p>Non-premium users will see a paywall on premium-gated MVP sections. The server remains the real protection.</p>
-            <ul className="ingredientList">
-              <li>Meal planner</li>
-              <li>Subscription-gated premium flows</li>
-            </ul>
-          </section>
         </div>
       </div>
     );
@@ -110,7 +104,7 @@ export default async function AccountPage() {
         </div>
         <div className="filterActions">
           <Link href="/account/login">Log in</Link>
-          <Link href="/account/register">Create account</Link>
+          <Link href="/account/register">Create an account</Link>
         </div>
       </div>
     );
