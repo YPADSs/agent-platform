@@ -25,6 +25,8 @@ jobs:
         run: node scripts/validate-netlify-config.mjs
       - name: Install
         run: npm install
+      - name: Generate Prisma client
+        run: npm run prisma:generate
       - name: Lint
         run: npm run lint
       - name: Typecheck
