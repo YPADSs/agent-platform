@@ -100,12 +100,16 @@ export async function upsertUserPreferencesByEmail(email: string, input: UserPre
   const prisma = getPrisma();
   const user = await getUserByEmailOrThrow(email);
 
-  const onboardingCompletedAt =
-    input.onboardingStatus === 'completed'
-      ? new Date()
-      : input.onboardingStatus && input.onboardingStatus !== 'completed'
-        ? null
-        : undefined;
+  const onboardingStatus = input.onboardingStatus;
+  let onboardingCompletedAt: Date | null | undefined;
+
+  if (onboardingStatus === undefined) {
+    onboardingCompletedAt = undefined;
+  } else if (onboardingStatus === 'completed') {
+    onboardingCompletedAt = new Date();
+  } else {
+    onboardingCompletedAt = null;
+  }
 
   await prisma.userPreferences.upsert({
     where: { userId: user.id },
