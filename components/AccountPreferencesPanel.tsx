@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 const LOCALE_OPTIONS = [
   { value: 'en', label: 'English' },
@@ -75,7 +75,7 @@ export default function AccountPreferencesPanel() {
         const preferencesData = await preferencesResponse.json().catch(() => ({}));
         const entitlementsData = await entitlementsResponse.json().catch(() => ({}));
 
-        if (!preferencesResponse.ok) || !entitlementsResponse.ok) {
+        if (!preferencesResponse.ok || !entitlementsResponse.ok) {
           if (isActive) {
             setError('Unable to load your Sprint 4 preferences right now.');
             setLoading(false);
@@ -113,7 +113,7 @@ export default function AccountPreferencesPanel() {
     return 'Planner remains Premium-gated until you upgrade.';
   }, [entitlements.canUsePlanner]);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setLiveStatus(null);
@@ -167,7 +167,7 @@ export default function AccountPreferencesPanel() {
             onChange={(event) => setPreferences((prev) => ({ ...prev, goalCode: event.target.value || null }))}
             placeholder="balanced_eating"
           />
-        </div>
+        </div
 
         <div className="field">
           <label htmlFor="locale">Language</label>
