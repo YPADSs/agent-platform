@@ -41,8 +41,8 @@ Responses should include a deterministic error code:
 | View/manage own account | Deny 401 | Allow | Allow | Allow | User-scoped data only |
 | Start checkout | Deny 401 | Allow | Allow | Allow | Auth-required |
 | Open customer portal | Deny 401 | Allow | Allow | Allow | Auth-required |
-| Access `/planner` | Deny 403 | Deny 403 | Allow | Allow | Premium-entitlement required |
-| Premium action (advanced filters / export/share) | Deny 403 | Deny 403 | Allow | Allow | Subscription-required |
+| Access `/planner` | Deny 403 | Deny 403 | Allow | Deny 403 unless separately premium-entitled | Premium entitlement required |
+| Premium action (advanced filters / export/share) | Deny 403 | Deny 403 | Allow | Deny 403 unless separately premium-entitled | Subscription-required |
 | Admin/editor content ops | Deny 403 | Deny 403 | Deny 403 | Allow | Admin-only |
 
 ## Server implementation rules
@@ -53,12 +53,14 @@ Responses should include a deterministic error code:
 4. Premium entitlement must be resolved from server-side billing state, refreshed by webhooks.
 5. Webhook handling must be idempotent by event id to avoid inconsistent access state.
 
-## Test matrix (minimum for Q)A
+## Test matrix (minimum for QA)
 
 - Guest cannot add favorites via direct request
 - Guest cannot persist a shopping list via direct request
 - User cannot access `/planner` without premium entitlement
 - User cannot call premium-action endpoints without premium entitlement
+- Admin-only content operations stay role-gated
+- Admin without premium entitlement does not bypass planner gating
 - User can only see/mutate own account/favorites/shopping list
 - Webhook replay does not corrupt subscription state or duplicate side-effects
 
