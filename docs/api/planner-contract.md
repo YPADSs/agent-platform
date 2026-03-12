@@ -1,6 +1,6 @@
 # Planner contract — Sprint 4 V1 groundwork
 
-Related issue: #139
+Related issue: #139, #140
 
 This document fixes the minimum server contract for planner access before the weekly UX, shopping list aggregation, and analytics layers are implemented.
 
@@ -41,7 +41,21 @@ Current shape:
           "title": "Recipe title"
         }
       }
-    ]
+    ],
+    "summary": {
+      "totals": {
+        "calories": 780,
+        "protein_g": 56,
+        "fat_g": 30,
+        "carbs_g": 68
+      },
+      "completeness": {
+        "hasMissingNutrition": false,
+        "missingItemCount": 0,
+        "isPartial": false
+      }
+    },
+    "warnings": []
   }
 }
 ```
@@ -50,6 +64,7 @@ Current shape:
 Upserts a planner item for the authenticated, premium-entitled user.
 
 Required request body fields:
+
 ```json
 {
   "date": "2026-03-10",
@@ -70,21 +85,49 @@ Validation rules:
 ### `DELETE /api/v1/planner/items/[itemId]`
 Deletes a planner item owned by the authenticated, premium-entitled user.
 
-## Reserved contract for follow-up issues
+### `GET /api/v1/planner/weeks/[weekStart]/shopping-list`
+Returns an aggregated, unit-aware shopping list for the planner week.
 
-This issue does **not** introduce full nutrient summary or shopping list aggregation yet. Those belong to follow-up implementation.
+Shape:
+```json
+{
+  "shoppingList": {
+    "weekStart": "2026-03-09T00:00:00.000Z",
+    "unitSystem": "metric",
+    "items": [
+      {
+        "ingredientKey": "olive oil::tbsp",
+        "displayName": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": null,
+        "sourceCount": 2,
+        "sourceRefs": [
+          {
+            "mealPlanItemId": "item_1",
+            "recipeId": "recipe_1",
+            "day": "2026-03-10",
+            "slot": "breakfast"
+          }
+        ],
+        "mergeStatus": "merged"
+      }
+    ],
+    "warnings": []
+  }
+}
+```
 
-### Reserved additions for issue #140
-- week-level `summary`
-- planner warnings such as:
-  - `MISSING_NUTRITION`
-  - `RECIPE_UNAVAILABLE`
-  - `UNSUPPORTED_UNIT_CONVERSION`
-- shopping list aggregation behavior and merge rules
-- unit propagation behavior based on preferences
+## Reserved contract boundaries
+
+- week-level summary is kept to calories, protein, fat, and carbs for V1
+- warnings cover missing nutrition, unavailable recipes, and unsafe unit conversions
+- aggregation merges only by name + normalized unit family, without aggressive alias logic
+- unit propagation is display-oriented based on user preferences, best-effort only
 
 ## Edge cases fixed by this groundwork
 
 - direct API access by authenticated non-premium users must fail with `403`
 - admin role alone must not unlock consumer planner routes
 - planner access checks must remain server-side and shared
+- recipe fallbacks may sinthesize nutrition/ingredients until content model is deeperly normalized
