@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requireSession } from '@/lib/session';
 import { getAccountStatusByEmail } from '@/lib/billing';
 import AccountPreferencesPanel from '@/components/AccountPreferencesPanel';
+import { getUserPreferencesByEmail } from '@/lib/preferences';
 
 export default async function AccountPage() {
   try {
@@ -27,7 +28,10 @@ export default async function AccountPage() {
       );
     }
 
-    const account = await getAccountStatusByEmail(email);
+    const [account, preferences] = await Promise.all([
+      getAccountStatusByEmail(email),
+      getUserPreferencesByEmail(email),
+    ]);
     if (!account) {
       return (
         <div className="recipesPage">
@@ -39,6 +43,7 @@ export default async function AccountPage() {
 
     const premiumLabel = account.subscription.isPremium ? 'Active' : 'Not active';
     const showCheckout = !account.subscription.isPremium;
+    const showOnboardingCallout = preferences.onboardingStatus !== 'completed';
 
     return (
       <div className="recipesPage">
@@ -47,13 +52,24 @@ export default async function AccountPage() {
           <p>Manage your account, subscription, saved content, and Premium access.</p>
         </div>
 
+        {showOnboardingCallout ? (
+          <section className="panel">
+            <h2>Complete your Sprint 4 setup</h2>
+            <p>Confirm your goal, language, and units so planner and shopping-list experiences can reuse the same settings.</p>
+            <div className="filterActions">
+              <Link href="/account/onboarding">Finish onboarding</Link>
+            </div>
+          </section>
+        ) : null}
+
         <div className="recipeColumns">
           <section className="panel">
             <h2>Profile</h2>
             <p><strong>Email:</strong> {account.user.email}</p>
             <p><strong>Role:</strong> {account.user.role}</p>
-            <p><strong>Subscription status:</strong> {account.subscription.status}</p>
+            <p><strong>Subscription status:</strong> {account.subscription.status} </p>
             <p><strong>Premium:</strong> {premiumLabel}</p>
+            <p><strong>Onboarding:</strong> {preferences.onboardingStatus}</p>
             {account.subscription.currentPeriodEnd ? (
               <p>
                 <strong>Current period end:</strong> {account.subscription.currentPeriodEnd}
@@ -73,6 +89,7 @@ export default async function AccountPage() {
               <li>
                 <Link href="/planner">Open meal planner</Link>{' '}<small className="muted">Premium-gated STRINT 4 entry point.</small>
               </li>
+              <li><Link href="/account/onboarding">Complete Sprint 4 setup</Link></li>
             </ul>
           </section>
 
