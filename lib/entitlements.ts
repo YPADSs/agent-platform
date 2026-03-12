@@ -17,7 +17,6 @@ export async function getEntitlementsForUser(userId: string): Promise<Entitlemen
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
-      role: true,
       subscription: {
         select: {
           status: true,
@@ -32,8 +31,9 @@ export async function getEntitlementsForUser(userId: string): Promise<Entitlemen
     user?.subscription?.currentPeriodEnd ?? null
   );
 
-  const canUsePlanner = user?.role === 'ADMIN' ? true : isPremium;
-  const canUsePlannerShoppingAggregation = canUsePlanner;
-
-  return { isPremium, canUsePlanner, canUsePlannerShoppingAggregation };
+  return {
+    isPremium,
+    canUsePlanner: isPremium,
+    canUsePlannerShoppingAggregation: isPremium,
+  };
 }
