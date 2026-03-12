@@ -14,21 +14,20 @@ body{margin:0;padding:0}
 .field{display:grid;gap:6px}
 .field input,.field select{padding:10px;border:1px solid #ccc;border-radius:10px}
 .fieldWide{grid-column:1/-1}
-.filterActions,.recipeActionRow,.servingsForm,.preferencesActions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.filterActions,.recipeActionRow,.servingsForm{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .recipeGrid{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:16px}
 .recipeCard{border:1px solid #e8e8e8;border-radius:16px;padding:16px;display:grid;gap:12px}
 .recipeCardHeader{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
-.cardLinksfont-weight:600}
+.cardLink{font-weight:600}
 .nutritionMini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
 .nutritionMini div{padding:10px;border:1px solid #eee;border-radius:10px}
 .nutritionMini dt{font-size:12px;color:#555}
 .nutritionMini dd{margin:4px 0 0;font-weight:600}
-.nutritionFully{grid-template-columns:repeat(4,minmax(0,1fr))}
+.nutritionFull{grid-template-columns:repeat(4,minmax(0,1fr))}
 .recipeDetail{display:grid;gap:16px}
 .recipeHero{display:grid;gap:8px}
 .recipeColumns{grid-template-columns:1fr}
 .recipeMetaGrid{grid-template-columns:1fr}
-.preferencesForm{display:grid;gap:12px;margin-top:12px}
 .resultsMeta,.statusMessage,.statusError{margin:0 0 12px}
 .statusMessage{color:#0a6b2c}
 .statusError{color:#a02828}
@@ -38,5 +37,5 @@ body{margin:0;padding:0}
 @media (min-width: 720px){
   .recipesFilters{grid-template-columns:repeat(2,minmax(0,1fr))}
   .recipeGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .recipeMetaGrid,.recipeColumns,.preferencesForm{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .recipeMetaGrid,.recipeColumns{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
