@@ -1,7 +1,11 @@
 import Link from 'next/link';
-import {notFound} from 'next/navigation';
-import {NextIntlClientProvider} from 'next-intl';
-import {getMessages, getTranslations, unstable_setRequestLocale} from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { NextIntlClientProvider } from 'next-intl';
+import {
+  getMessages,
+  getTranslations,
+  unstable_setRequestLocale,
+} from 'next-intl/server';
 import { defaultLocale, locales, type Locale } from '../../i18n';
 import { getLocaleRootMetadata } from '@/lib/seo';
 
@@ -26,7 +30,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   unstable_setRequestLocale(locale);
 
   const messages = await getMessages();
-  const t = await getTranslations('nvv');
+  const t = await getTranslations('nav');
 
   const navItems = [
     { href: `/${locale}/`, label: t('home') },
@@ -56,7 +60,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               className="navLink"
               aria-label={`Switch language to ${l}`}
             >
-              {l.toUpperCase()}
+              l.toUpperCase()
             </Link>
           ))}
         </div>
