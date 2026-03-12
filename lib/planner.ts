@@ -1,22 +1,23 @@
+import type { MealSlot } from '@prisma/client';
 import { getPrisma } from '@/lib/prisma';
 import { getEntitlementsForUser } from '@/lib/entitlements';
 
 export const SUPPORTED_MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 export type SupportedMealSlot = (typeof SUPPORTED_MEAL_SLOTS)[number];
 
-const slotToDb = {
+const slotToDb: Record<SupportedMealSlot, MealSlot> = {
   breakfast: 'BREAKFAST',
   lunch: 'LUNCH',
   dinner: 'DINNER',
   snack: 'SNACK',
-} as const;
+};
 
-const slotFromDb = {
+const slotFromDb: Record<MealSlot, SupportedMealSlot> = {
   BREAKFAST: 'breakfast',
   LUNCH: 'lunch',
   DINNER: 'dinner',
   SNACK: 'snack',
-} as const;
+};
 
 export function isSupportedMealSlot(value: unknown): value is SupportedMealSlot {
   return typeof value === 'string' && SUPPORTED_MEAL_SLOTS.includes(value as SupportedMealSlot);
@@ -65,11 +66,7 @@ export async function getPlannerWeek(userId: string, weekStartDate: Date) {
     },
     include: {
       items: {
-        orderBy: [
-          { planDate: 'asc' },
-          { slot: 'asc' },
-          { slotIndex: 'asc' },
-        ],
+        orderBy: [{ planDate: 'asc' }, { slot: 'asc' }, { slotIndex: 'asc' }],
         include: {
           recipe: {
             select: { id: true, slug: true, title: true },
