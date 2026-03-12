@@ -1,9 +1,36 @@
 import type { MealSlot } from '@prisma/client';
 import { getPrisma } from '@/lib/prisma';
 import { getEntitlementsForUser } from '@/lib/entitlements';
+import { getRecipeDetail } from '@/lib/recipes';
 
 export const SUPPORTED_MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 export type SupportedMealSlot = (typeof SUPPORTED_MEAL_SLOTS)[number];
+
+type PlannerWarningCode =
+  | 'MISSING_NUTRITION'
+  | 'RECIPE_UNAVAILABLE'
+  | 'UNSUPPORTED_UNIT_CONVERSION';
+
+export type PlannerWarning = {
+  code: PlannerWarningCode;
+  itemId: string;
+};
+
+export type PlannerShoppingListItem = {
+  ingredientKey: string;
+  displayName: string;
+  quantity: number | null;
+  unit: string | null;
+  category: null;
+  sourceCount: number;
+  sourceRefs: Array<{
+    mealPlanItemId: string;
+    recipeId: string | null;
+    day: string;
+    slot: SupportedMealSlot;
+  };
+  mergeStatus: 'merged' | 'separate' | 'partial';
+};
 
 const slotToDb: Record<SupportedMealSlot, MealSlot> = {
   breakfast: 'BREAKFAST',
@@ -45,6 +72,88 @@ export function isDateInsideWeek(planDate: Date, weekStartDate: Date) {
   return current >= start && current < end;
 }
 
+function normalizeText(value: string) {
+  return value.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function roundAmount(value: number) {
+  if (value >= 100) return Math.round(value);
+  if (value >= 10) return Number(value.toFixed(1));
+  return Number(value.toFixed(2));
+}
+
+function getIsoDay(value: Date) {
+  return startOfUtcDay(value).toISOString().slice(0, 10);
+}
+
+async function getPlannerUnitSystem(userId: string): Promise<\n'metric' | 'imperial'> {
+  const prisma = getPrisma();
+  const preferences = await prisma.userPreferences.findUnique({
+    where: { userId },
+    select: { unitSystem: true },
+  });
+
+  return preferences?.unitSystem === 'IMPERIAL' ? 'imperial' : 'metric';
+}
+
+function convertUnitForSystem(
+  amount: number,
+  unit: string,
+  unitSystem: 'metric' | 'imperial',
+]: { quantity: number; unit: string; warning?: 'UNSUPPORTED_UNIT_CONVERSION' } {
+  if (unitSystem === 'metric') {
+    return { quantity: amount, unit };
+  }
+
+  const normalizedUnit = normalizeText(unit);
+
+  if (normalizedUnit === 'g') {
+    return { quantity: amount / 28.3495, unit: 'oz' };
+  }
+
+  if (normalizedUnit === 'ml') {
+    return { quantity: amount / 29.5735, unit: 'fl oz' };
+  }
+
+  if (
+    normalizedUnit === 'pc' ||
+    normalizedUnit === 'pcs' ||
+    normalizedUnit === 'piece' ||
+    normalizedUnit === 'pieces' ||
+    normalizedUnit === 'tbsp' ||
+    normalizedUnit === 'tsp' ||
+    normalizedUnit === 'clove'
+  ) {
+    return { quantity: amount, unit };
+  }
+
+  return { quantity: amount, unit, warning: 'UNSUPPORTED_UNIT_CONVERSION' };
+}
+
+async function getPlannerWeekData(userId: string, weekStartDate: Date) {
+  const prisma = getPrisma();
+  const plan = await prisma.mealPlan.findUnique({
+    where: {
+      userId_weekStartDate: {
+        userId,
+        weekStartDate,
+      },
+    },
+    include: {
+      items: {
+        orderBy: [{planDate: 'asc'}, { slot: 'asc'}, { slotIndex: 'asc' }],
+        include: {
+          recipe: {
+            select: { id: true, slug: true, title: true },
+          },
+        },
+      },
+    },
+  });
+
+  return plan?.items ?? [];
+}
+
 export async function requirePlannerAccess(userId: string) {
   const entitlements = await getEntitlementsForUser(userId);
   if (!entitlements.canUsePlanner) {
@@ -56,37 +165,122 @@ export async function requirePlannerAccess(userId: string) {
 }
 
 export async function getPlannerWeek(userId: string, weekStartDate: Date) {
-  const prisma = getPrisma();
-  const plan = await prisma.mealPlan.findUnique({
-    where: {
-      userId_weekStartDate: {
-        userId,
-        weekStartDate,
-      },
-    },
-    include: {
-      items: {
-        orderBy: [{ planDate: 'asc' }, { slot: 'asc' }, { slotIndex: 'asc' }],
-        include: {
-          recipe: {
-            select: { id: true, slug: true, title: true },
-          },
-        },
-      },
-    },
-  });
+  const items = await getPlannerWeekData(userId, weekStartDate);
+
+  const warnings: PlannerWarning[] = [];
+  let calories = 0;
+  let protein = 0;
+  let fat = 0;
+  let carbs = 0;
+  let missingItemCount = 0;
+
+  for (const item of items) {
+    const detail = await getRecipeDetail(item.recipe.slug, item.servings);
+
+    if (!detail) {
+      missingItemCount += 1;
+      warnings.push({ code: 'RECIPE_UNAVAILABLE', itemId: item.id });
+      continue;
+    }
+
+    if (!detail.nutrition) {
+      missingItemCount += 1;
+      warnings.push({ code: 'MISSING_NUTRITION', itemId: item.id });
+      continue;
+    }
+
+    calories += detail.nutrition.calories;
+    protein += detail.nutrition.protein;
+    fat += detail.nutrition.fat;
+    carbs += detail.nutrition.carbs;
+  }
 
   return {
     weekStart: weekStartDate.toISOString(),
-    items:
-      plan?.items.map((item) => ({
-        id: item.id,
-        date: item.planDate.toISOString(),
-        slot: slotFromDb[item.slot],
-        slotIndex: item.slotIndex,
-        servings: item.servings,
-        recipe: item.recipe,
-      })) ?? [],
+    items: items.map((item) => ({
+      id: item.id,
+      date: item.planDate.toISOString(),
+      slot: slotFromDb[item.slot],
+      slotIndex: item.slotIndex,
+      servings: item.servings,
+      recipe: item.recipe,
+    })),
+    summary: {
+      totals: {
+        calories: roundAmount(calories),
+        protein_g: roundAmount(protein),
+        fat_g: roundAmount(fat),
+        carbs_g: roundAmount(carbs),
+      },
+      completeness: {
+        hasMissingNutrition: missingItemCount > 0,
+        missingItemCount,
+        isPartial: missingItemCount > 0,
+      },
+    },
+    warnings,
+  };
+}
+
+export async function getPlannerWeekShoppingList(userId: string, weekStartDate: Date) {
+  const items = await getPlannerWeekData(userId, weekStartDate);
+  const unitSystem = await getPlannerUnitSystem(userId);
+
+  const warnings: PlannerWarning[] = [];
+  const aggregated = new Map<string, PlannerShoppingListItem>();
+
+  for (const item of items) {
+    const slot = slotFromDb[item.slot];
+    const detail = await getRecipeDetail(item.recipe.slug, item.servings);
+
+    if (!detail) {
+      warnings.push({ code: 'RECIPE_UNAVAILABLE', itemId: item.id });
+      continue;
+    }
+
+    for (const ingredient of detail.ingredients) {
+      const conversion = convertUnitForSystem(ingredient.amount, ingredient.unit, unitSystem);
+
+      if (conversion.warning) {
+        warnings.push({ code: conversion.warning, itemId: item.id });
+      }
+
+      const key = `${normalizeText(ingredient.name)}::${normalizeText(conversion.unit)}`;
+      const existing = aggregated.get(key);
+
+      const sourceRef = {
+        mealPlanItemId: item.id,
+        recipeId: item.recipe.id,
+        day: getIsoDay(item.planDate),
+        slot,
+      };
+
+      if (!existing) {
+        aggregated.set(key, {
+          ingredientKey: key,
+          displayName: ingredient.name,
+          quantity: roundAmount(conversion.quantity),
+          unit: conversion.unit,
+          category: null,
+          sourceCount: 1,
+          sourceRefs: [sourceRef],
+          mergeStatus: 'separate',
+        });
+        continue;
+      }
+
+      existing.quantity = roundAmount((existing.quantity ?? 0) + conversion.quantity);
+      existing.sourceCount += 1;
+      existing.sourceRefs.push(sourceRef);
+      existing.mergeStatus = 'merged';
+    }
+  }
+
+  return {
+    weekStart: weekStartDate.toISOString(),
+    unitSystem,
+    items: Array.from(aggregated.values()).sort((a, b) => a.displayName.localeCompare(b.displayName)),
+    warnings,
   };
 }
 
