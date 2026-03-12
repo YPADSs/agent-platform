@@ -47,7 +47,7 @@ export function isDateInsideWeek(planDate: Date, weekStartDate: Date) {
 
 export async function requirePlannerAccess(userId: string) {
   const entitlements = await getEntitlementsForUser(userId);
-  if (!entitlements.isPremium && !entitlements.canUsePlanner) {
+  if (!entitlements.canUsePlanner) {
     const err = new Error('PREMIUM_REQUIRED') as Error & { status?: number };
     err.status = 403;
     throw err;
