@@ -103,13 +103,13 @@ export default function OnboardingPreferencesFlow() {
       return 'Planner is ready on this account once your core setup is confirmed.';
     }
 
-    return 'Planner remains Premium-gated, but units and language will still carry forward to your account experience.';
+    return 'Planner remains Premium-gated, but units and language will carry forward to your account experience.';
   }, [entitlements.canUsePlanner]);
 
   const isCompleted = preferences.onboardingStatus === 'completed';
 
   async function savePreferences(onboardingStatus: 'in_progress' | 'completed') {
-    setError();
+    setError(null);
     setStatusMessage(null);
     setSaving(true);
 
@@ -167,7 +167,7 @@ export default function OnboardingPreferencesFlow() {
         <div className="emptyState">
           <p>
             Sprint 4 V1 currently persists <strong>goal</strong>, <strong>language</strong>, and
-            <strong> units</strong> as the core onboarding baseline.
+            <strong>units</strong> as the core onboarding baseline.
           </p>
           <p className="muted">
             Diet/preference/allergy details can be extended later only when explicitly scoped.
@@ -281,7 +281,7 @@ export default function OnboardingPreferencesFlow() {
         </ul>
         <div className="filterActions">
           <Link href="/account">Go to Account</Link>
-          <Link href="/planner">{isCompleted ? 'Go to Planner' : 'View Phanner status'}</Link>
+          <Link href="/planner">{isCompleted ? 'Go to Planner' : 'View Planner status'}</Link>
         </div>
       </section>
     </div>
