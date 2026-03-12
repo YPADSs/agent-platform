@@ -1,5 +1,5 @@
 import { type MetadataRoute } from 'next';
-import { getLocalizedPublicPaths, getSiteBaseUrl } from '@/lib/seo';
+import { getPublicLocalizedPaths, getSiteBaseUrl } from '@/lib/seo';
 import { locales } from '../i18n';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const items: MetadataRoute.Sitemap = [];
 
   for (const locale of locales) {
-    for (const path of getLocalizedPublicPaths()) {
+    for (const path of getPublicLocalizedPaths()) {
       items.push({
         url: `${getSiteBaseUrl()}/${locale}${path}`,
         lastModified: now,
