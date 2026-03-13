@@ -1,24 +1,21 @@
-import {type MetadataRoute} from 'next';
-import {locales} from '../i18n';
-
-function baseUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-}
-
-const paths = ['', '/recipes', '/articles', '/favorites', '/shopping-list', '/planner', '/account', '/legal/privacy', '/legal/terms', '/legal/cookies', '/legal/disclaimer'];
+import { type MetadataRoute } from 'next';
+import { getPublicLocalizedPaths, getSiteBaseUrl } from '@/lib/seo';
+import { locales } from '../i18n';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const items: MetadataRoute.Sitemap = [];
+
   for (const locale of locales) {
-    for (const p of paths) {
+    for (const path of getPublicLocalizedPaths()) {
       items.push({
-        url: `${baseUrl()}/${locale}${p}`,
+        url: `${getSiteBaseUrl()}/${locale}${path}`,
         lastModified: now,
-        changeFrequency: 'weekly',
-        priority: p === '' ? 1 : 0.6
+        changeFrequency: path === '' ? 'daily' : 'weekly',
+        priority: path === '' ? 1 : 0.7,
       });
     }
   }
+
   return items;
 }
