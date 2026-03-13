@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
 type PlannerWarning = {
-  code: 'MISSING_NUTRITION' | 'RECIPE_UNAVAILABLE' | 'UNSUPPORTED_UNIT_CONVERSION';
+  code: string;
   itemId: string;
 };
 
@@ -40,11 +40,6 @@ type PlannerWeek = {
   warnings?: PlannerWarning[];
 };
 
-type PlannerWeekResponse = {
-  week?: PlannerWeek;
-  error?: string;
-};
-
 type ShoppingListItem = {
   ingredientKey: string;
   displayName: string;
@@ -53,34 +48,21 @@ type ShoppingListItem = {
   sourceCount: number;
 };
 
-type ShoppingListResponse = {
-  shoppingList?: {
-    weekStart: string;
-    unitSystem: 'metric' | 'imperial';
-    items: ShoppingListItem[];
-  };
-  error?: string;
-};
-
-type PlannerRecipeSearchItem = {
+type PlannerRecipe = {
   id: string;
   slug: string;
   title: string;
 };
 
-type PlannerRecipeSearchResponse = {
-  recipes?: PlannerRecipeSearchItem[];
-};
+const SLOTS: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'snack'];
+const DAY_ = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const MEAL_SLOTS: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'snack'];
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-function parseDateInput(value: string): Date {
-  const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, (month || 1) - 1, day || 1);
+function parseDate(value: string) {
+  const [y, m, d] = value.split('-').map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
 }
 
-function startOfWeek(date: Date): Date {
+function startOfWeek(date: Date) {
   const copy = new Date(date);
   copy.setHours(0, 0, 0, 0);
   const day = copy.getDay();
@@ -89,84 +71,74 @@ function startOfWeek(date: Date): Date {
   return copy;
 }
 
-function addDays(date: Date, days: number): Date {
+function addDays(date: Date, days: number) {
   const copy = new Date(date);
   copy.setDate(copy.getDate() + days);
   return copy;
 }
 
-function formatDateInput(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+function formatDate(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
-function getSlotLabel(slot: MealSlot): string {
+function slotLabel(slot: MealSlot) {
   return slot.charAt(0).toUpperCase() + slot.slice(1);
 }
 
-function getWarningLabel(code: PlannerWarning['code']): string {
-  switch (code) {
-    case 'MISSING_NUTRITION':
-      return 'Some recipe nutrition is unavailable.';
-    case 'RECIPE_UNAVAILABLE':
-      return 'A planned recipe is no longer available.';
-    case 'UNSUPPORTED_UNIT_CONVERSION':
-      return 'Some shopping list units stayed unchanged to avoid unsafe conversion.';
-    default:
-      return 'Planner warning.';
-  }
+function warningLabel(code: string) {
+  if (code === 'MISSING_NUTRITION') return 'Some recipe nutrition is unavailable.';
+  if (code === 'RECIPE_UNAVAILABLE') return 'A planned recipe is no longer available.';
+  if (code === 'UNSUPPORTED_UNIT_CONVERSION') return 'Some shopping list units stayed unchanged to avoid unsafe conversion.';
+  return 'Planner warning.';
 }
 
-function getPayloadError(payload: unknown, fallback: string): string {
-  if (payload && typeof payload === 'object' && 'error' in payload) {
-    const value = (payload as { error?: unknown }).error;
-    if (typeof value === 'string') {
-      return value;
-    }
+function getError(payload: any, fallback: string) {
+  if (payload && typeof payload === 'object' && typeof payload.error === 'string') {
+    return payload.error;
   }
   return fallback;
 }
 
 export default function PlannerCalendar() {
-  const [weekStart, setWeekStart] = useState<string>(() => formatDateInput(startOfWeek(new Date())));
+  const [weekStart, setWeekStart] = useState(formatDate(startOfWeek(new Date()));
   const [week, setWeek] = useState<PlannerWeek | null>(null);
-  const [shoppingList, setShoppingList] = useState<ShoppingListResponse['shoppingList'] | null>(null);
-  const [recipes, setRecipes] = useState<PlannerRecipeSearchItem[]>([]);
-  const [loadingWeek, setLoadingWeek] = useState<boolean>(true);
-  const [loadingRecipes, setLoadingRecipes] = useState<boolean>(false);
-  const [saving, setSaving] = useState<boolean>(false);
+  const [shoppingList, setShoppingList] = useState<[?[ ]>(null);
+  const [recipes, setRecipes] = useState<PlannerRecipe[]>([]);
+  const [loadingWeek, setLoadingWeek] = useState(true);
+  const [loadingRecipes, setLoadingRecipes] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [activeComposer, setActiveComposer] = useState<{ date: string; slot: MealSlot } | null>(null);
-  const [recipeQuery, setRecipeQuery] = useState<string>('');
+  const [recipeQuery, setRecipeQuery] = useState('');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadWeek(targetWeekStart: string): Promise<void> {
+  async function loadWeek(target: string) {
     setLoadingWeek(true);
     setError(null);
-
     try {
-      const [weekResponse, shoppingResponse] = await Promise.all([
-        fetch(`/api/v1/planner/weeks/${targetWeekStart}`, { cache: 'no-store' }),
-        fetch(`/api/v1/planner/weeks/${targetWeekStart}/shopping-list`, { cache: 'no-store' }),
+      const [weekRes, shoppingRes] = await Promise.all([
+        fetch(`/api/v1/planner/weeks/${target}`, { cache: 'no-store' }),
+        fetch(`/api/v1/planner/weeks/${target}/shopping-list`, { cache: 'no-store' }),
       ]);
 
-      const weekPayload: unknown = await weekResponse.json().catch(() => ({}));
-      const shoppingPayload: unknown = await shoppingResponse.json().catch(() => ({}));
+      const weekData = await weekRes.json().catch(() => ({}));
+      const shoppingData = await shoppingRes.json().catch(() => ({}));
 
-      if (!weekResponse.ok) {
-        setError(getPayloadError(weekPayload, 'Unable to load this planner week.'));
+      if (!weekRes.ok) {
+        setError(getError(weekData, 'Unable to load this planner week.'));
         return;
       }
 
-      if (!shoppingResponse.ok) {
-        setError(getPayloadError(shoppingPayload, 'Unable to load the planner shopping list.'));
+      if (!shoppingRes.ok) {
+        setError(getError(shoppingData, 'Unable to load the planner shopping list.'));
         return;
       }
 
-      setWeek(((weekPayload as PlannerWeekResponse).week ?? null));
-      setShoppingList(((shoppingPayload as ShoppingListResponse).shoppingList ?? null));
+      setWeek(weekData.week ?? null);
+      setShoppingList(shoppingData.shoppingList ?? null);
     } catch {
       setError('Network error while loading planner data.');
     } finally {
@@ -174,26 +146,19 @@ export default function PlannerCalendar() {
     }
   }
 
-  async function loadRecipes(slot: MealSlot, query: string): Promise<void> {
+  async function loadRecipes(slot: MealSlot, query: string) {
     setLoadingRecipes(true);
-
     try {
       const params = new URLSearchParams({ slot });
-      if (query.trim()) {
-        params.set('q', query.trim());
-      }
+      if (query.trim()) params.set('q', query.trim());
 
-      const response = await fetch(`/api/v1/planner/recipes?${params.toString()}`, {
-        cache: 'no-store',
-      });
-
-      const payload: unknown = await response.json().catch(() => ({}));
-      if (!response.ok) {
+      const res = await fetch(`/api/v1/planner/recipes?${params.toString()}`, { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
         setRecipes([]);
         return;
       }
-
-      setRecipes(((payload as PlannerRecipeSearchResponse).recipes ?? []));
+      setRecipes(Array.isArray(data.recipes) ? data.recipes : []);
     } catch {
       setRecipes([]);
     } finally {
@@ -213,40 +178,40 @@ export default function PlannerCalendar() {
     void loadRecipes(activeComposer.slot, recipeQuery);
   }, [activeComposer, recipeQuery]);
 
-  const weekDates = useMemo(Date[_A]() => {
-    const start = startOfWeek(parseDateInput(weekStart));
+  const weekDates = useMemo(() => {
+    const start = startOfWeek(parseDate(weekStart));
     return Array.from({ length: 7 }, (_, index) => addDays(start, index));
   }, [weekStart]);
 
   const itemsBySlot = useMemo(() => {
     const map = new Map<string, PlannerItem[]>();
-    for (const item of week?.items ?? []) {
+    const items = week?.items ?? [];
+    for (const item of items) {
       const key = `${item.date.slice(0, 10)}::${item.slot}`;
-      const current = map.get(key) ?? [];
-      current.push(item);
-      current.sort((a, b) => a.slotIndex - b.slotIndex);
-      map.set(key, current);
+      const list = map.get(key) ?? [];
+      list.push(item);
+      list.sort((left, right) => left.slotIndex - right.slotIndex);
+      map.set(key, list);
     }
     return map;
   }, [week]);
 
-  async function refreshWeek(message?: string): Promise<void> {
+  async function refreshWeek(message?: string) {
     await loadWeek(weekStart);
-    if (message) {
-      setStatusMessage(message);
-    }
+    if (message) setStatusMessage(message);
   }
 
-  async function addRecipe(date: string, slot: MealSlot, recipeId: string): Promise<void> {
-    const currentItems = itemsBySlot.get(`${date}::${slot}`) ?? [];
-    const nextSlotIndex = currentItems.length > 0 ? Math.max(...currentItems.map((item) => item.slotIndex)) + 1 : 1;
+  async function addRecipe(date: string, slot: MealSlot, recipeId: string) {
+    const key = `${date}::${slot}`;
+    const existing = itemsBySlot.get(key) ?? [];
+    const nextSlotIndex = existing.length > 0 ? Math.max(...existing.map((item) => item.slotIndex)) + 1 : 1;
 
     setSaving(true);
     setStatusMessage(null);
     setError(null);
 
     try {
-      const response = await fetch(`/api/v1/planner/weeks/${weekStart}`, {
+      const res = await fetch(`/api/v1/planner/weeks/${weekStart}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -257,16 +222,14 @@ export default function PlannerCalendar() {
           servings: 1,
         }),
       });
-
-      const payload: unknown = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        setError(getPayloadError(payload, 'Unable to add the recipe to your planner.'));
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(getError(data, 'Unable to add the recipe to your planner.'));
         return;
       }
-
       setActiveComposer(null);
       setRecipeQuery('');
-      await refreshWeek(`${getSlotLabel(slot)} updated for ${date}.`);
+      await refreshWeek(`${slotLabel(slot)} updated for ${date}.`);
     } catch {
       setError('Network error while saving planner changes.');
     } finally {
@@ -274,22 +237,17 @@ export default function PlannerCalendar() {
     }
   }
 
-  async function removeItem(itemId: string): Promise<void> {
+  async function removeItem(itemId: string) {
     setSaving(true);
     setStatusMessage(null);
     setError(null);
-
     try {
-      const response = await fetch(`/api/v1/planner/items/${itemId}`, {
-        method: 'DELETE',
-      });
-
-      const payload: unknown = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        setError(getPayloadError(payload, 'Unable to remove the planner item.'));
+      const res = await fetch(`/api/v1/planner/items/${itemId}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(getError(data, 'Unable to remove the planner item.'));
         return;
       }
-
       await refreshWeek('Planner item removed.');
     } catch {
       setError('Network error while removing planner item.');
@@ -298,9 +256,9 @@ export default function PlannerCalendar() {
     }
   }
 
-  function shiftWeek(days: number): void {
-    const next = addDays(parseDateInput(weekStart), days);
-    setWeekStart(formatDateInput(startOfWeek(next)));
+  function shiftWeek(days: number) {
+    const next = addDays(parseDate(weekStart), days);
+    setWeekStart(formatDate(startOfWeek(next)));
     setActiveComposer(null);
     setRecipeQuery('');
     setStatusMessage(null);
@@ -318,15 +276,9 @@ export default function PlannerCalendar() {
             </p>
           </div>
           <div className="plannerWeekControls">
-            <button type="button" onClick={() => shiftWeek(-7)}>
-              Previous week
-            </button>
-            <button type="button" onClick={() => setWeekStart(formatDateInput(startOfWeek(new Date())))}>
-              This week
-            </button>
-            <button type="button" onClick={() => shiftWeek(7)}>
-              Next week
-            </button>
+            <button type="button" onClick={() => shiftWeek(-7)}>Previous week</button>
+            <button type="button" onClick={() => setWeekStart(formatDate(startOfWeek(new Date())))}>This week</button>
+            <button type="button" onClick={() => shiftWeek(7)}>Next week</button>
           </div>
         </div>
 
@@ -335,38 +287,26 @@ export default function PlannerCalendar() {
         {error ? <p className="statusError">{error}</p> : null}
 
         {loadingWeek ? (
-          <p>Loading planner week… </p>
+          <p>Loading planner week…</p>
         ) : (
           <div className="plannerGrid">
             {weekDates.map((date, index) => {
-              const isoDate = formatDateInput(date);
-
+              const isoDate = formatDate(date);
               return (
                 <article key={isoDate} className="plannerDayCard">
                   <div className="plannerDayHeader">
-                    <h3>
-                      {DAY_LABELS[index]} {date.getDate()}
-                    </h3>
+                    <h3>{DAY_[index]} {date.getDate()}</h3>
                     <span className="badge">{isoDate}</span>
                   </div>
-
                   <div className="plannerSlots">
-                    {MEAL_SLOTS.map((slot) => {
+                    {SLOTS.map((slot) => {
                       const slotItems = itemsBySlot.get(`${isoDate}::${slot}`) ?? [];
                       const composerOpen = activeComposer?.date === isoDate && activeComposer?.slot === slot;
-
                       return (
                         <section key={`${isoDate}-${slot}`} className="plannerSlotCard">
                           <div className="plannerSlotHeader">
-                            <strong>{getSlotLabel(slot)}</strong>
-                            <button
-                              type="button"
-                              disabled={saving}
-                              onClick={() => {
-                                setActiveComposer({ date: isoDate, slot });
-                                setRecipeQuery('');
-                              }}
-                            >
+                            <strong>{slotLabel(slot)}</strong>
+                            <button type="button" disabled={saving} onClick={() => { setActiveComposer({ date: isoDate, slot }); setRecipeQuery(''); }}>
                               {slotItems.length ? 'Add another' : 'Add meal'}
                             </button>
                           </div>
@@ -377,13 +317,9 @@ export default function PlannerCalendar() {
                                 <li key={item.id} className="plannerItemRow">
                                   <div>
                                     <strong>{item.recipe.title}</strong>
-                                    <p className="muted">
-                                      {item.servings} serving{item.servings > 1 ? 's' : ''} · slot #{item.slotIndex}
-                                    </p>
+                                    <p className="muted">{item.servings} serving{item.servings > 1 ? 's' : ''} · slot #{item.slotIndex}</p>
                                   </div>
-                                  <button type="button" disabled={saving} onClick={() => void removeItem(item.id)}>
-                                    Remove
-                                  </button>
+                                  <button type="button" disabled={saving} onClick={() => void removeItem(item.id)}>Remove</button>
                                 </li>
                               ))}
                             </ul>
@@ -395,15 +331,10 @@ export default function PlannerCalendar() {
                             <div className="plannerComposer">
                               <label className="field">
                                 <span>Find a recipe</span>
-                                <input
-                                  type="search"
-                                  value={recipeQuery}
-                                  onChange={(event) => setRecipeQuery(event.target.value)}
-                                  placeholder={`Search ${slot} recipes`}
-                                />
+                                <input type="search" value={recipeQuery} onChange={(event) => setRecipeQuery(event.target.value)} placeholder={`Search ${slot} recipes`} />
                               </label>
 
-                              {loadingRecipes ? <p className="muted">Loading recipes… </p> : null}
+                              {loadingRecipes ? <p className="muted">Loading recipes…</p> : null}
 
                               <ul className="plannerRecipeResults">
                                 {recipes.map((recipe) => (
@@ -412,20 +343,12 @@ export default function PlannerCalendar() {
                                       <strong>{recipe.title}</strong>
                                       <p className="muted">{recipe.slug}</p>
                                     </div>
-                                    <button
-                                      type="button"
-                                      disabled={saving}
-                                      onClick={() => void addRecipe(isoDate, slot, recipe.id)}
-                                    >
-                                      Add
-                                    </button>
+                                    <button type="button" disabled={saving} onClick={() => void addRecipe(isoDate, slot, recipe.id)}>Add</button>
                                   </li>
                                 ))}
                               </ul>
 
-                              {!loadingRecipes && !recipes.length ? (
-                                <p className="muted">No recipes matched this slot yet.</p>
-                              ) : null}
+                              {!loadingRecipes && !recipes.length ? <p className="muted">No recipes matched this slot yet.</p> : null}
                             </div>
                           ) : null}
                         </section>
@@ -443,36 +366,18 @@ export default function PlannerCalendar() {
         <section className="panel">
           <h2>Week summary</h2>
           <dl className="plannerSummaryGrid">
-            <div>
-              <dt>Meals planned</dt>
-              <dd>{week/.items.length ?? 0}</dd>
-            </div>
-            <div>
-              <dt>Calories</dt>
-              <dd>{week?.summary?.totals?.calories ?? 0}</dd>
-            </div>
-            <div>
-              <dt>Protein</dt>
-              <dd>{week?.summary?.totals?.protein_g ?? 0}g</dd>
-            </div>
-            <div>
-              <dt>Fat</dt>
-              <dd>{week?.summary?.totals?.fat_g ?? 0}g</dd>
-            </div>
-            <div>
-              <dt>Carbs</dt>
-              <dd>{week?.summary?.totals?.carbs_g ?? 0}g</dd>
-            </div>
-            <div>
-              <dt>Coverage</dt>
-              <dd>{week/.summary?.completeness?.isPartial ? 'Partial' : 'Complete'}</dd>
-            </div>
+            <div><dt>Meals planned</dt><dd>{week?.items.length ?? 0}</dd></div>
+            <div><dt>Calories</dt><dd>{week?.summary?.totals?.calories ?? 0}</dd></div>
+            <div><dt>Protein</dt><dd>{week?.summary?.totals?.protein_g ?? 0}g</dd></div>
+            <div><dt>Fat</dt><dd>{week/.summary?.totals?.fat_g ?? 0}g</dd></div>
+            <div><dt>Carbs</dt><dd>{week?.summary?.totals?.carbs_g ?? 0}g</dd></div>
+            <div><dt>Coverage</dt><dd>{week/.summary?.completeness?.isPartial ? 'Partial' : 'Complete'}</dd></div>
           </dl>
 
-          {week/.warnings?.length ? (
+          {week?.warnings?.length ? (
             <ul className="plannerWarnings">
               {week.warnings.map((warning, index) => (
-                <li key={`${warning.itemId}-${warning.code}-${index}`}>{getWarningLabel(warning.code)}</li>
+                <li key={`${warning.itemId}-${index}`}>{warningLabel(warning.code)}</li>
               ))}
             </ul>
           ) : (
@@ -485,26 +390,19 @@ export default function PlannerCalendar() {
             <h2>Shopping list preview</h2>
             <Link href="/shopping-list">Open full shopping list</Link>
           </div>
-
-          <p className="muted">
-            Aggregated in {shoppingList?.unitSystem ?? 'metric'} units from your current planner week.
-          </p>
+          <p className="muted">Aggregated in {shoppingList?.unitSystem ?? 'metric'} units from your current planner week.</p>
 
           {shoppingList?.items?.length ? (
             <ul className="ingredientList">
               {shoppingList.items.slice(0, 8).map((item) => (
                 <li key={item.ingredientKey}>
                   <strong>{item.displayName}</strong>
-                  <span className="muted">
-                    {item.quantity} {item.unit} · {item.sourceCount} recipe{item.sourceCount > 1 ? 's' : ''}
-                  </span>
+                  <span className="muted">{item.quantity} {item.unit} · {item.sourceCount} recipe{item.sourceCount > 1 ? 's' : ''}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <div className="emptyState">
-              <p>Add meals to your week to see an aggregated shopping list preview.</p>
-            </div>
+            <div className="emptyState"><p>Add meals to your week to see an aggregated shopping list preview.</p></div>
           )}
         </section>
       </div>
