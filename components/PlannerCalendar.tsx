@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -75,7 +74,12 @@ type PlannerRecipeSearchResponse = {
 };
 
 const MEAL_SLOTS: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'snack'];
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Frig', 'Sat', 'Sun'];
+
+function parseDateInput(value: string) {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, (month ?? 1) - 1, day ?? 1);
+}
 
 function startOfWeek(date: Date) {
   const copy = new Date(date);
@@ -165,8 +169,7 @@ export default function PlannerCalendar() {
     setLoadingRecipes(true);
 
     try {
-      const params = new URLSearchParams();
-      params.set('slot', slot);
+      const params = new URLSearchParams({ slot });
       if (query.trim()) {
         params.set('q', query.trim());
       }
@@ -204,7 +207,7 @@ export default function PlannerCalendar() {
   }, [activeComposer, recipeQuery]);
 
   const weekDates = useMemo(() => {
-    const start = startOfWeek(new Date(weekStart));
+    const start = startOfWeek(parseDateInput(weekStart));
     return Array.from({ length: 7 }, (_, index) => addDays(start, index));
   }, [weekStart]);
 
@@ -293,7 +296,7 @@ export default function PlannerCalendar() {
   }
 
   function shiftWeek(days: number) {
-    const next = addDays(new Date(weekStart), days);
+    const next = addDays(parseDateInput(weekStart), days);
     setWeekStart(formatDateInput(startOfWeek(next)));
     setActiveComposer(null);
     setRecipeQuery('');
@@ -311,10 +314,15 @@ export default function PlannerCalendar() {
             </p>
           </div>
           <div className="plannerWeekControls">
-            <button type="button" onClick={() => shiftWeek(-7)}>Previous week</button>
-            <button type="button" onClick={() => setWeekStart(formatDateInput(startOfWeek(new Date())))}>This week
+            <button type="button" onClick={() => shiftWeek(-7)}>
+              Previous week
             </button>
-            <button type="button" onClick={() => shiftWeek(7)}>Next week</button>
+            <button type="button" onClick={() => setWeekStart(formatDateInput(startOfWeek(new Date())))}>
+              This week
+            </button>
+            <button type="button" onClick={() => shiftWeek(7)}>
+              Next week
+            </button>
           </div>
         </div>
 
@@ -322,9 +330,7 @@ export default function PlannerCalendar() {
         {statusMessage ? <p className="statusMessage">{statusMessage}</p> : null}
         {error ? <p className="statusError">{error}</p> : null}
 
-        {loadingWeek ? (
-          <p>Loading planner week …</p>
-        ) : (
+        {loadingWeek ? (\n          <p>Loading planner week …</p>\n        ) : (
           <div className="plannerGrid">
             {weekDates.map((date, index) => {
               const isoDate = formatDateInput(date);
@@ -332,7 +338,9 @@ export default function PlannerCalendar() {
               return (
                 <article key={isoDate} className="plannerDayCard">
                   <div className="plannerDayHeader">
-                    <h3>{DAY_LABELS[index]} {date.getDate()}</h3>
+                    <h3>
+                      {DAY_LABELS[index]} {date.getDate()}
+                    </h3>
                     <span className="badge">{isoDate}</span>
                   </div>
 
@@ -349,7 +357,7 @@ export default function PlannerCalendar() {
                               type="button"
                               disabled={saving}
                               onClick={() => {
-                                setActiveComposer { date: isoDate, slot });
+                                setActiveComposer({ date: isoDate, slot });
                                 setRecipeQuery('');
                               }}
                             >
@@ -363,15 +371,13 @@ export default function PlannerCalendar() {
                                 <li key={item.id} className="plannerItemRow">
                                   <div>
                                     <strong>{item.recipe.title}</strong>
-                                    <p className="muted">{item.servings} serving ¶ slot #{item.slotIndex}</p>
+                                    <p className="muted">
+                                      {item.servings} serving{item.servings > 1 ? 's' : ''} · slot #{item.slotIndex}
+                                    </p>
                                   </div>
-                                  <button
-                                    type="button"
-                                    disabled={saving}
-                                    onClick={() => {
-                                      void removeItem(item.id);
-                                    }}
-                                  >Remove</button>
+                                  <button type="button" disabled={saving} onClick={() => void removeItem(item.id)}>
+                                    Remove
+                                  </button>
                                 </li>
                               ))}
                             </ul>
@@ -403,10 +409,10 @@ export default function PlannerCalendar() {
                                     <button
                                       type="button"
                                       disabled={saving}
-                                      onClick={() => {
-                                        void adRRecipe(isoDate, slot, recipe.id);
-                                      }}
-                                    >Add</button>
+                                      onClick={() => void addRecipe(isoDate, slot, recipe.id)}
+                                    >
+                                      Add
+                                    </button>
                                   </li>
                                 ))}
                               </ul>
@@ -431,12 +437,30 @@ export default function PlannerCalendar() {
         <section className="panel">
           <h2>Week summary</h2>
           <dl className="plannerSummaryGrid">
-            <div><dt>Meals planned</dt><dd>{week/.items.length ?? 0}</dd></div>
-            <div><dt>Calories</dt><dd>{week/.summary?.totals.calories ?? 0}</dd></div>
-            <div><dt>Protein</dt><dd>{week?.summary?.totals.protein_g ?? 0}g</dd></div>
-            <div><dt>Fat</dt><dd>{week?.summary?.totals.fat_g ?? 0}g</dd></div>
-            <div><dt>Carbs</dt><dd>{week/.summary?.totals.carbs_g ?? 0}g</dd></div>
-            <div><dt>Coverage</dt><dd>{week/.summary?.completeness.isPartial ? 'Partial' : 'Complete'}</dd></div>
+            <div>
+              <dt>Meals planned</dt>
+              <dd>{week/.items.length ?? 0}</dd>
+            </div>
+            <div>
+              <dt>Calories</dt>
+              <dd>{week?.summary?.totals.calories ?? 0}</dd>
+            </div>
+            <div>
+              <dt>Protein</dt>
+              <dd>{week?.summary?.totals.protein_g ?? 0}g</dd>
+            </div>
+            <div>
+              <dt>Fat</dt>
+              <dd>{week?.summary?.totals.fat_g ?? 0}g</dd>
+            </div>
+            <div>
+              <dt>Carbs</dt>
+              <dd>{week?.summary?.totals.carbs_g ?? 0}g</dd>
+            </div>
+            <div>
+              <dt>Coverage</dt>
+              <dd>{week?.summary?.completeness.isPartial ? 'Partial' : 'Complete'}</dd>
+            </div>
           </dl>
 
           {week?.warnings?.length ? (
@@ -456,14 +480,18 @@ export default function PlannerCalendar() {
             <Link href="/shopping-list">Open full shopping list</Link>
           </div>
 
-          <p className="muted">Aggregated in {shoppingList?.unitSystem ?? 'metric'} units from your current planner week.</p>
+          <p className="muted">
+            Aggregated in {shoppingList?.unitSystem ?? 'metric'} units from your current planner week.
+          </p>
 
           {shoppingList?.items?.length ? (
             <ul className="ingredientList">
               {shoppingList.items.slice(0, 8).map((item) => (
                 <li key={item.ingredientKey}>
                   <strong>{item.displayName}</strong>
-                  <span className="muted">{item.quantity} {item.unit} · {item.sourceCount} recipe{item.sourceCount > 1 ? 's' : ''}</span>
+                  <span className="muted">
+                    {item.quantity} {item.unit} ¶ {item.sourceCount} recipe{item.sourceCount > 1 ? 's' : ''}
+                  </span>
                 </li>
               ))}
             </ul>
