@@ -1,10 +1,12 @@
+
 import Link from 'next/link';
+import PlannerCalendar from '@/components/PlannerCalendar';
 import { requirePremium } from '@/lib/premium';
 import { requireSession } from '@/lib/session';
 import { getUserPreferencesByEmail } from '@/lib/preferences';
 
 export default async function PlannerPage() {
-  let preferences : Awaited<ReturnType<typeof getUserPreferencesByEmail>> | null = null;
+  let preferences: Awaited<ReturnType<typeof getUserPreferencesByEmail>> | null = null;
 
   try {
     const session = await requireSession();
@@ -12,10 +14,10 @@ export default async function PlannerPage() {
     if (email) {
       preferences = await getUserPreferencesByEmail(email);
     }
+
     await requirePremium();
-  } catch (err) {
-    const showOnboardingCta =
-      preferences && preferences.onboardingStatus !== 'completed';
+  } catch {
+    const showOnboardingCta = preferences && preferences.onboardingStatus !== 'completed';
 
     return (
       <div className="recipesPage">
@@ -33,15 +35,20 @@ export default async function PlannerPage() {
 
   return (
     <div className="recipesPage">
-      <h1>Meal Planner (Premium)</h1>
-      <p>Premium access confirmed (server-side).</p>
+      <div className="pageIntro">
+        <h1>Meal Planner (Premium)</h1>
+        <p>Build your weekly plan, review nutrient totals, and preview a planner-driven shopping list.</p>
+      </div>
+
       {showOnboardingCallout ? (
         <section className="panel">
           <h2>Complete your core setup</h2>
-          <p>Confirm your language, units, and goal before you move into the full weekly planner experience.</p>
+          <p>Confirm your goal, language, and units before you rely on the full weekly planner experience.</p>
           <Link href="/account/onboarding">Open onboarding</Link>
         </section>
       ) : null}
+
+      <PlannerCalendar />
     </div>
   );
 }
