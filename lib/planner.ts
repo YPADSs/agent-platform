@@ -6,7 +6,7 @@ import { getRecipeDetail } from '@/lib/recipes';
 export const SUPPORTED_MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 export type SupportedMealSlot = (typeof SUPPORTED_MEAL_SLOTS)[number];
 
-type PlannerWarningCode =
+export type PlannerWarningCode =
   | 'MISSING_NUTRITION'
   | 'RECIPE_UNAVAILABLE'
   | 'UNSUPPORTED_UNIT_CONVERSION';
@@ -19,8 +19,8 @@ export type PlannerWarning = {
 export type PlannerShoppingListItem = {
   ingredientKey: string;
   displayName: string;
-  quantity: number | null;
-  unit: string | null;
+  quantity: number;
+  unit: string;
   category: null;
   sourceCount: number;
   sourceRefs: Array<{
@@ -28,7 +28,7 @@ export type PlannerShoppingListItem = {
     recipeId: string | null;
     day: string;
     slot: SupportedMealSlot;
-  };
+  }>;
   mergeStatus: 'merged' | 'separate' | 'partial';
 };
 
@@ -86,7 +86,7 @@ function getIsoDay(value: Date) {
   return startOfUtcDay(value).toISOString().slice(0, 10);
 }
 
-async function getPlannerUnitSystem(userId: string): Promise<\n'metric' | 'imperial'> {
+async function getPlannerUnitSystem(userId: string): Promise<'metric' | 'imperial'> {
   const prisma = getPrisma();
   const preferences = await prisma.userPreferences.findUnique({
     where: { userId },
@@ -100,7 +100,7 @@ function convertUnitForSystem(
   amount: number,
   unit: string,
   unitSystem: 'metric' | 'imperial',
-]: { quantity: number; unit: string; warning?: 'UNSUPPORTED_UNIT_CONVERSION' } {
+): { quantity: number; unit: string; warning?: 'UNSUPPORTED_UNIT_CONVERSION' } {
   if (unitSystem === 'metric') {
     return { quantity: amount, unit };
   }
@@ -141,7 +141,7 @@ async function getPlannerWeekData(userId: string, weekStartDate: Date) {
     },
     include: {
       items: {
-        orderBy: [{planDate: 'asc'}, { slot: 'asc'}, { slotIndex: 'asc' }],
+        orderBy: [{ planDate: 'asc' }, { slot: 'asc' }, { slotIndex: 'asc' }],
         include: {
           recipe: {
             select: { id: true, slug: true, title: true },
@@ -166,7 +166,6 @@ export async function requirePlannerAccess(userId: string) {
 
 export async function getPlannerWeek(userId: string, weekStartDate: Date) {
   const items = await getPlannerWeekData(userId, weekStartDate);
-
   const warnings: PlannerWarning[] = [];
   let calories = 0;
   let protein = 0;
@@ -225,7 +224,6 @@ export async function getPlannerWeek(userId: string, weekStartDate: Date) {
 export async function getPlannerWeekShoppingList(userId: string, weekStartDate: Date) {
   const items = await getPlannerWeekData(userId, weekStartDate);
   const unitSystem = await getPlannerUnitSystem(userId);
-
   const warnings: PlannerWarning[] = [];
   const aggregated = new Map<string, PlannerShoppingListItem>();
 
@@ -247,7 +245,6 @@ export async function getPlannerWeekShoppingList(userId: string, weekStartDate: 
 
       const key = `${normalizeText(ingredient.name)}::${normalizeText(conversion.unit)}`;
       const existing = aggregated.get(key);
-
       const sourceRef = {
         mealPlanItemId: item.id,
         recipeId: item.recipe.id,
@@ -269,7 +266,7 @@ export async function getPlannerWeekShoppingList(userId: string, weekStartDate: 
         continue;
       }
 
-      existing.quantity = roundAmount((existing.quantity ?? 0) + conversion.quantity);
+      existing.quantity = roundAmount(existing.quantity + conversion.quantity);
       existing.sourceCount += 1;
       existing.sourceRefs.push(sourceRef);
       existing.mergeStatus = 'merged';
