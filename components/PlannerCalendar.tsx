@@ -5,6 +5,11 @@ import { useEffect, useMemo, useState } from 'react';
 
 type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
+type PlannerWarning = {
+  code: 'MISSING_NUTRITION' | 'RECIPE_UNAVAILABLE' | 'UNSUPPORTED_UNIT_CONVERSION';
+  itemId: string;
+};
+
 type PlannerItem = {
   id: string;
   date: string;
@@ -16,11 +21,6 @@ type PlannerItem = {
     slug: string;
     title: string;
   };
-};
-
-type PlannerWarning = {
-  code: 'MISSING_NUTRITION' | 'RECIPE_UNAVAILABLE' | 'UNSUPPORTED_UNIT_CONVERSION';
-  itemId: string;
 };
 
 type PlannerWeek = {
@@ -78,7 +78,7 @@ const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Frig', 'Sat', 'Sun'];
 
 function parseDateInput(value: string) {
   const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, (month ?? 1) - 1, day ?? 1);
+  return new Date(year, (month || 1) - 1, day || 1);
 }
 
 function startOfWeek(date: Date) {
@@ -143,8 +143,12 @@ export default function PlannerCalendar() {
         fetch(`/api/v1/planner/weeks/${targetWeekStart}/shopping-list`, { cache: 'no-store' }),
       ]);
 
-      const weekData = (await weekResponse.json().catch(() => ({}))) as Partial<PlannerWeekResponse> & { error?: string };
-      const shoppingListData = (await shoppingListResponse.json().catch(() => ({})) as Partial<ShoppingListResponse> & { error?: string };
+      const weekData = ((await weekResponse.json().catch(() => ({})) as Partial<PlannerWeekResponse> & {
+        error?: string;
+      });
+      const shoppingListData = ((await shoppingListResponse.json().catch(() => ({}))) as Partial<ShoppingListResponse> & {
+        error?: string;
+      });
 
       if (!weekResponse.ok) {
         setError(weekData.error ?? 'Unable to load this planner week.');
@@ -178,7 +182,7 @@ export default function PlannerCalendar() {
         cache: 'no-store',
       });
 
-      const data = (await response.json().catch(() => ({})) as Partial<PlannerRecipeSearchResponse>;
+      const data = (await response.json().catch(() => ({}))) as Partial<PlannerRecipeSearchResponse>;
 
       if (!response.ok) {
         setRecipes([]);
@@ -233,8 +237,10 @@ export default function PlannerCalendar() {
   }
 
   async function addRecipe(date: string, slot: MealSlot, recipeId: string) {
-    const existing = itemsBySlot.get(`${date}::${slot}`) ?? [];
-    const nextSlotIndex = existing.length ? Math.max(...existing.map((item) => item.slotIndex)) + 1 : 1;
+    const existingItems = itemsBySlot.get(`${date}::${slot}`) ?? [];
+    const nextSlotIndex = existingItems.length
+      ? Math.max(...existingItems.map((item) => item.slotIndex)) + 1
+      : 1;
 
     setSaving(true);
     setStatusMessage(null);
@@ -253,7 +259,7 @@ export default function PlannerCalendar() {
         }),
       });
 
-      const data = (await response.json().catch(() => ({})) as { error?: string };
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
 
       if (!response.ok) {
         setError(data.error ?? 'Unable to add the recipe to your planner.');
@@ -317,7 +323,10 @@ export default function PlannerCalendar() {
             <button type="button" onClick={() => shiftWeek(-7)}>
               Previous week
             </button>
-            <button type="button" onClick={() => setWeekStart(formatDateInput(startOfWeek(new Date())))}>
+            <button
+              type="button"
+              onClick={() => setWeekStart(formatDateInput(startOfWeek(new Date())))}
+            >
               This week
             </button>
             <button type="button" onClick={() => shiftWeek(7)}>
@@ -330,7 +339,9 @@ export default function PlannerCalendar() {
         {statusMessage ? <p className="statusMessage">{statusMessage}</p> : null}
         {error ? <p className="statusError">{error}</p> : null}
 
-        {loadingWeek ? (\n          <p>Loading planner week …</p>\n        ) : (
+        {loadingWeek ? (
+          <p>Loading planner week…</p>
+        ) : (
           <div className="plannerGrid">
             {weekDates.map((date, index) => {
               const isoDate = formatDateInput(date);
@@ -347,7 +358,8 @@ export default function PlannerCalendar() {
                   <div className="plannerSlots">
                     {MEAL_SLOTS.map((slot) => {
                       const slotItems = itemsBySlot.get(`${isoDate}::${slot}`) ?? [];
-                      const composerOpen = activeComposer?.date === isoDate && activeComposer?.slot === slot;
+                      const composerOpen =
+                        activeComposer?.date === isoDate && activeComposer?.slot === slot;
 
                       return (
                         <section key={`${isoDate}-${slot}`} className="plannerSlotCard">
@@ -375,7 +387,11 @@ export default function PlannerCalendar() {
                                       {item.servings} serving{item.servings > 1 ? 's' : ''} · slot #{item.slotIndex}
                                     </p>
                                   </div>
-                                  <button type="button" disabled={saving} onClick={() => void removeItem(item.id)}>
+                                  <button
+                                    type="button"
+                                    disabled={saving}
+                                    onClick={() => void removeItem(item.id)}
+                                  >
                                     Remove
                                   </button>
                                 </li>
@@ -439,7 +455,7 @@ export default function PlannerCalendar() {
           <dl className="plannerSummaryGrid">
             <div>
               <dt>Meals planned</dt>
-              <dd>{week/.items.length ?? 0}</dd>
+              <dd>{week?.items.length ?? 0}</dd>
             </div>
             <div>
               <dt>Calories</dt>
@@ -451,7 +467,7 @@ export default function PlannerCalendar() {
             </div>
             <div>
               <dt>Fat</dt>
-              <dd>{week?.summary?.totals.fat_g ?? 0}g</dd>
+              <dd>{week/.summary?.totals.fat_g ?? 0}g</dd>
             </div>
             <div>
               <dt>Carbs</dt>
@@ -459,14 +475,16 @@ export default function PlannerCalendar() {
             </div>
             <div>
               <dt>Coverage</dt>
-              <dd>{week?.summary?.completeness.isPartial ? 'Partial' : 'Complete'}</dd>
+              <dd>{week/.summary?.completeness?.isPartial ? 'Partial' : 'Complete'}</dd>
             </div>
           </dl>
 
-          {week?.warnings?.length ? (
+          {week/.warnings?.length ? (
             <ul className="plannerWarnings">
               {week.warnings.map((warning, index) => (
-                <li key={`${warning.itemId}-${warning.code}-${index}`}>{getWarningLabel(warning.code)}</li>
+                <li key={`${warning.itemId}-${warning.code}-${index}`}>
+                  {getWarningLabel(warning.code)}
+                </li>
               ))}
             </ul>
           ) : (
@@ -490,7 +508,7 @@ export default function PlannerCalendar() {
                 <li key={item.ingredientKey}>
                   <strong>{item.displayName}</strong>
                   <span className="muted">
-                    {item.quantity} {item.unit} ¶ {item.sourceCount} recipe{item.sourceCount > 1 ? 's' : ''}
+                    {item.quantity} {item.unit} · {item.sourceCount} recipe{item.sourceCount > 1 ? 's' : ''}
                   </span>
                 </li>
               ))}
