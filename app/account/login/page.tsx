@@ -1,9 +1,13 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useParams } from "next/navigation";
 import { useState } from "react";
+import { withLocale } from '@/lib/locale-path';
 
 export default function LoginPage() {
+  const params = useParams<{ locale?: string }>();
+  const locale = typeof params?.locale === "string" ? params.locale : undefined;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -13,7 +17,11 @@ export default function LoginPage() {
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-          await signIn("credentials", { email, password, callbackUrl: "/account" });
+          await signIn("credentials", {
+            email,
+            password,
+            callbackUrl: withLocale(locale, '/account'),
+          });
         }}
       >
         <label>
