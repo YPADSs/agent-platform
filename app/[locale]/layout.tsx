@@ -60,7 +60,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               className="navLink"
               aria-label={`Switch language to ${l}`}
             >
-              l.toUpperCase()
+              {l.toUpperCase()}
             </Link>
           ))}
         </div>
