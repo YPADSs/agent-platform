@@ -2,7 +2,6 @@
 body{margin:0;padding:0}
 .header{position:sticky;top:0;background:#fff;border-bottom:1px solid #eee}
 .nav{display:flex;gap:12px;flex-wrap:wrap;padding:12px}
-.navLink+text-decoration:none;color:#111}
 .navLink {text-decoration:none;color:#111}
 .main{padding:16px;max-width:960px;margin:0 auto}
 .footer{padding:16px;border-top:1px solid #eee;max-width:960px;margin:0 auto}
@@ -15,7 +14,7 @@ body{margin:0;padding:0}
 .field{display:grid;gap:6px}
 .field input,.field select{padding:10px;border:1px solid #ccc;border-radius:10px}
 .fieldWide{grid-column:1/-1}
-.filterActions,.recipeActionRow,.servingsForm{display:flex;gip:12px;align-items:center;flex-wrap:wrap}
+.filterActions,.recipeActionRow,.servingsForm{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .recipeGrid{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:16px}
 .recipeCard{border:1px solid #e8e8e8;border-radius:16px;padding:16px;display:grid;gap:12px}
 .recipeCardHeader{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
@@ -38,7 +37,7 @@ body{margin:0;padding:0}
 .plannerLayout{display:grid;gap:16px}
 .plannerSidebar{display:grid;gap:16px}
 .plannerHeaderRow,.plannerSlotHeader,.plannerDayHeader,.plannerSidebarHeader{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
-.plannerWeekControls{display:flex;gip:8px;flex-wrap:wrap}
+.plannerWeekControls{display:flex;gap:8px;flex-wrap:wrap}
 .plannerWeekControls button,.plannerSlotHeader button,.plannerItemRow button,.plannerRecipeResult button{padding:10px 12px;border:1px solid #ccc;border-radius:10px;background:#fff}
 .plannerGrid,.plannerSlots,.plannerComposer,.plannerWarnings{display:grid;gap:12px}
 .plannerDayCard,.plannerSlotCard{border:1px solid #e8e8e8;border-radius:16px;padding:12px;background:#fafafa}
