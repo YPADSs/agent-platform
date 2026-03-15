@@ -1,8 +1,8 @@
-
 'use client';
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { track } from '@/lib/analytics';
 
 type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
@@ -103,7 +103,11 @@ export default function PlannerCalendar() {
 
     try {
       const params = new URLSearchParams({ slot });
-      if (query.trim()) params.set('q', query.trim());
+      const trimmedQuery = query.trim();
+
+      if (trimmedQuery) {
+        params.set('q', trimmedQuery);
+      }
 
       const response = await fetch(`/api/v1/planner/recipes?${params.toString()}`, {
         cache: 'no-store',
@@ -111,6 +115,20 @@ export default function PlannerCalendar() {
 
       const payload = await response.json().catch(() => ({}));
       setRecipes(response.ok && Array.isArray(payload.recipes) ? payload.recipes : []);
+
+      if (trimmedQuery) {
+        void track({
+          name: 'planner_recipe_search',
+          ts: Date.now(),
+          props: {
+            surface: 'planner',
+            slot,
+            weekStart,
+            hasQuery: true,
+            queryLength: trimmedQuery.length,
+          },
+        });
+      }
     } catch {
       setRecipes([]);
     } finally {
@@ -152,12 +170,16 @@ export default function PlannerCalendar() {
 
   async function refreshWeek(message?: string) {
     await loadWeek(weekStart);
-    if (message) setStatusMessage(message);
+    if (message) {
+      setStatusMessage(message);
+    }
   }
 
   async function addRecipe(date: string, slot: MealSlot, recipeId: string) {
     const slotItems = itemsBySlot.get(`${date}::${slot}`) ?? [];
-    const nextSlotIndex = slotItems.length ? Math.max(...slotItems.map((item) => item.slotIndex)) + 1 : 1;
+    const nextSlotIndex = slotItems.length
+      ? Math.max(...slotItems.map((item) => item.slotIndex)) + 1
+      : 1;
 
     setSaving(true);
     setStatusMessage(null);
@@ -167,7 +189,13 @@ export default function PlannerCalendar() {
       const response = await fetch(`/api/v1/planner/weeks/${weekStart}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, slot, slotIndex: nextSlotIndex, recipeId, servings: 1 }),
+        body: JSON.stringify({
+          date,
+          slot,
+          slotIndex: nextSlotIndex,
+          recipeId,
+          servings: 1,
+        }),
       });
 
       const payload = await response.json().catch(() => ({}));
@@ -179,6 +207,16 @@ export default function PlannerCalendar() {
       setComposer(null);
       setRecipeQuery('');
       await refreshWeek(`${SLOT_LABELS[slot]} updated for ${date}.`);
+      void track({
+        name: 'planner_item_added',
+        ts: Date.now(),
+        props: {
+          surface: 'planner',
+          weekStart,
+          date,
+          slot,
+        },
+      });
     } catch {
       setError('Network error while saving planner changes.');
     } finally {
@@ -186,21 +224,32 @@ export default function PlannerCalendar() {
     }
   }
 
-  async function removeItem(itemId: string) {
+  async function removeItem(itemId: string, slot?: MealSlot) {
     setSaving(true);
     setStatusMessage(null);
     setError(null);
 
     try {
-      const response = await fetch(`/api/v1/planner/items/${itemId}`, { method: 'DELETE' });
-      const payload = await response.json().catch(() => ({}));
+      const response = await fetch(`/api/v1/planner/items/${itemId}`, {
+        method: 'DELETE',
+      });
 
+      const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
         setError(payloadError(payload, 'Unable to remove the planner item.'));
         return;
       }
 
       await refreshWeek('Planner item removed.');
+      void track({
+        name: 'planner_item_removed',
+        ts: Date.now(),
+        props: {
+          surface: 'planner',
+          weekStart,
+          slot,
+        },
+      });
     } catch {
       setError('Network error while removing planner item.');
     } finally {
@@ -209,10 +258,21 @@ export default function PlannerCalendar() {
   }
 
   function moveWeek(days: number) {
-    setWeekStart(formatDate(startOfWeek(addDays(parseDate(weekStart), days))));
+    const nextWeekStart = formatDate(startOfWeek(addDays(parseDate(weekStart), days)));
+    setWeekStart(nextWeekStart);
     setComposer(null);
     setRecipeQuery('');
     setStatusMessage(null);
+    void track({
+      name: 'planner_week_changed',
+      ts: Date.now(),
+      props: {
+        surface: 'planner',
+        fromWeekStart: weekStart,
+        toWeekStart: nextWeekStart,
+        direction: days < 0 ? 'previous' : days > 0 ? 'next' : 'current',
+      },
+    });
   }
 
   return (
@@ -222,13 +282,39 @@ export default function PlannerCalendar() {
           <div>
             <h2>Weekly calendar</h2>
             <p className="muted">
-              Plan breakfast, lunch, dinner, and snacks for the week. Premium protection stays enforced on the server.
+              Plan breakfast, lunch, dinner, and snacks for the week. Premium
+              protection stays enforced on the server.
             </p>
           </div>
           <div className="plannerWeekControls">
-            <button type="button" onClick={() => moveWeek(-7)}>Previous week</button>
-            <button type="button" onClick={() => setWeekStart(formatDate(startOfWeek(new Date())))}>This week</button>
-            <button type="button" onClick={() => moveWeek(7)}>Next week</button>
+            <button type="button" onClick={() => moveWeek(-7)}>
+              Previous week
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const currentWeek = formatDate(startOfWeek(new Date()));
+                setWeekStart(currentWeek);
+                setComposer(null);
+                setRecipeQuery('');
+                setStatusMessage(null);
+                void track({
+                  name: 'planner_week_changed',
+                  ts: Date.now(),
+                  props: {
+                    surface: 'planner',
+                    fromWeekStart: weekStart,
+                    toWeekStart: currentWeek,
+                    direction: 'current',
+                  },
+                });
+              }}
+            >
+              This week
+            </button>
+            <button type="button" onClick={() => moveWeek(7)}>
+              Next week
+            </button>
           </div>
         </div>
 
@@ -246,7 +332,9 @@ export default function PlannerCalendar() {
               return (
                 <article key={isoDate} className="plannerDayCard">
                   <div className="plannerDayHeader">
-                    <h3>{DAY_LABELS[index]} {date.getDate()}</h3>
+                    <h3>
+                      {DAY_LABELS[index]} {date.getDate()}
+                    </h3>
                     <span className="badge">{isoDate}</span>
                   </div>
 
@@ -281,7 +369,11 @@ export default function PlannerCalendar() {
                                       {item.servings} serving{item.servings > 1 ? 's' : ''} · slot #{item.slotIndex}
                                     </p>
                                   </div>
-                                  <button type="button" disabled={saving} onClick={() => void removeItem(item.id)}>
+                                  <button
+                                    type="button"
+                                    disabled={saving}
+                                    onClick={() => void removeItem(item.id, slot)}
+                                  >
                                     Remove
                                   </button>
                                 </li>
@@ -312,7 +404,11 @@ export default function PlannerCalendar() {
                                       <strong>{recipe.title}</strong>
                                       <p className="muted">{recipe.slug}</p>
                                     </div>
-                                    <button type="button" disabled={saving} onClick={() => void addRecipe(isoDate, slot, recipe.id)}>
+                                    <button
+                                      type="button"
+                                      disabled={saving}
+                                      onClick={() => void addRecipe(isoDate, slot, recipe.id)}
+                                    >
                                       Add
                                     </button>
                                   </li>
@@ -339,12 +435,30 @@ export default function PlannerCalendar() {
         <section className="panel">
           <h2>Week summary</h2>
           <dl className="plannerSummaryGrid">
-            <div><dt>Meals planned</dt><dd>{week?.items?.length ?? 0}</dd></div>
-            <div><dt>Calories</dt><dd>{week?.summary?.totals?.calories ?? 0}</dd></div>
-            <div><dt>Protein</dt><dd>{week?.summary?.totals?.protein_g ?? 0}g</dd></div>
-            <div><dt>Fat</dt><dd>{week?.summary?.totals?.fat_g ?? 0}g</dd></div>
-            <div><dt>Carbs</dt><dd>{week?.summary?.totals?.carbs_g ?? 0}g</dd></div>
-            <div><dt>Coverage</dt><dd>{week?.summary?.completeness?.isPartial ? 'Partial' : 'Complete'}</dd></div>
+            <div>
+              <dt>Meals planned</dt>
+              <dd>{week?.items?.length ?? 0}</dd>
+            </div>
+            <div>
+              <dt>Calories</dt>
+              <dd>{week?.summary?.totals?.calories ?? 0}</dd>
+            </div>
+            <div>
+              <dt>Protein</dt>
+              <dd>{week?.summary?.totals?.protein_g ?? 0}g</dd>
+            </div>
+            <div>
+              <dt>Fat</dt>
+              <dd>{week?.summary?.totals?.fat_g ?? 0}g</dd>
+            </div>
+            <div>
+              <dt>Carbs</dt>
+              <dd>{week?.summary?.totals?.carbs_g ?? 0}g</dd>
+            </div>
+            <div>
+              <dt>Coverage</dt>
+              <dd>{week?.summary?.completeness?.isPartial ? 'Partial' : 'Complete'}</dd>
+            </div>
           </dl>
 
           {week?.warnings?.length ? (
