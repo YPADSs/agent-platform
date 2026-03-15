@@ -1,5 +1,5 @@
-
 import Link from 'next/link';
+import EventTracker from '@/components/EventTracker';
 import PlannerCalendar from '@/components/PlannerCalendar';
 import { requirePremium } from '@/lib/premium';
 import { requireSession } from '@/lib/session';
@@ -24,6 +24,10 @@ export default async function PlannerPage() {
 
     return (
       <div className="recipesPage">
+        <EventTracker
+          name="paywall_viewed"
+          props={{ surface: 'planner', gatedFeature: 'planner' }}
+        />
         <h1>Meal Planner (Premium)</h1>
         <p>This feature requires Premium. Server-side gating is enforced.</p>
         <div className="filterActions">
@@ -42,6 +46,7 @@ export default async function PlannerPage() {
 
   return (
     <div className="recipesPage">
+      <EventTracker name="planner_viewed" props={{ surface: 'planner' }} />
       <div className="pageIntro">
         <h1>Meal Planner (Premium)</h1>
         <p>Use your weekly planner, nutrient summary, and shopping list in one place.</p>
