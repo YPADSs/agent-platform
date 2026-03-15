@@ -9,9 +9,10 @@ import {
   getContentDetailAlternates,
   getContentDetailCanonical,
 } from '@/lib/seo';
+import { withLocale } from '@/lib/locale-path';
 
 type ArticleDetailPageProps = {
-  params: { slug: string };
+  params: { slug: string; locale?: string };
 };
 
 export async function generateMetadata({ params }: ArticleDetailPageProps): Promise<Metadata> {
@@ -33,18 +34,14 @@ export async function generateMetadata({ params }: ArticleDetailPageProps): Prom
       canonical,
       languages: getContentDetailAlternates('articles', article.slug),
     },
-    openGraph: {
-      title: article.title,
-      description: article.description,
-      url: canonical,
-      type: 'article',
-    },
+    openGraph: {},
   };
 }
 
 export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
   const article = await getArticleDetail(params.slug);
   if (!article) return notFound();
+  const locale = params.locale;
 
   const schema = {
     '@context': 'https://schema.org',
@@ -101,7 +98,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
             <ul className="ingredientList">
               {article.related.length ? article.related.map((item) => (
                 <li key={`${item.kind}-${item.slug}`}>
-                  <Link href={item.kind === 'recipe' ? `/recipes/${item.slug}` : `/articles/${item.slug}`}>
+                  <Link href={withLocale(locale, item.kind === 'recipe' ? `/recipes/${item.slug}` : `/articles/${item.slug}`)}>
                     {item.title}
                   </Link>
                   <small className="muted">{item.kind}</small>
