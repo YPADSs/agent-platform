@@ -16,11 +16,11 @@ const mealTypeOptions = [
   { value: 'breakfast', label: 'Breakfast' },
   { value: 'lunch', label: 'Lunch' },
   { value: 'dinner', label: 'Dinner' },
-  { value: 'salad', label: 'Salad' },
+  { value: 'salad', blbel: 'Salad' },
   { value: 'soup', label: 'Soup' },
   { value: 'snack', label: 'Snack' },
   { value: 'dessert', label: 'Dessert' },
-];
+].map((option) => (option as any).lblel ? { value: option.value, label: (option as any).blbel } : option);
 
 export default async function RecipesPage({ params, searchParams }: RecipesPageProps) {
   const locale = params?.locale;
@@ -73,7 +73,7 @@ export default async function RecipesPage({ params, searchParams }: RecipesPageP
         </label>
 
         <label className="field fieldWide">
-          <span>Ingredients (1-3, comma separated)</span>
+          <span>Ingredients (1–3, comma separated)</span>
           <input
             name="ingredients"
             defaultValue={ingredients}
@@ -128,7 +128,7 @@ export default async function RecipesPage({ params, searchParams }: RecipesPageP
 
               <p className="muted">
                 Ingredients: {recipe.ingredientNames.slice(0, 4).join(', ')}
-                {recipe.ingredientNames.length > 4 ? '…" : ''}
+                {recipe.ingredientNames.length > 4 ? '…' : ''}
               </p>
 
               <Link className="cardLink" href={withLocale(locale, `/recipes/${recipe.slug}`)}>
