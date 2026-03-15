@@ -26,36 +26,42 @@ enum MealSlot {
   SNACK
 }
 
+enum ShoppingListSourceType {
+  MANUAL
+  RECIPE
+  PLANNER
+}
+
 model User {
-  id            String  @id @default(cuid())
-  email         String  @unique
-  passwordHash  String
-  role          Role    @default(USER)
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+  role         Role   @default(USER)
 
   // Stripe linkage (optional until first checkout)
   stripeCustomerId String? @unique
 
-  subscription   Subscription?
-  mealPlans      MealPlan[]
+  subscription Subscription?
+  mealPlans     MealPlan[]
 
-  favorites      Favorite[]
-  shoppingItems  ShoppingListItem[]
+  favorites     Favorite[]
+  shoppingItems ShoppingListItem[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Subscription {
-  id                   String             @id @default(cuid())
-  userId               String             @unique
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String             @id @default(cuid())
+  userId        String             @unique
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  stripeSubscriptionId String?            @unique
-  status               SubscriptionStatus @default(INACTIVE)
+  stripeSubscriptionId String?             @unique
+  status               SubscriptionStatus  @default(INACTIVE)
   currentPeriodEnd     DateTime?
 
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model BillingEvent {
@@ -67,13 +73,13 @@ model BillingEvent {
 }
 
 model Recipe {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  title     String
-  body      String
+  id            String         @id @default(cuid())
+  slug          String         @unique
+  title         String
+  body          String
   mealPlanItems MealPlanItem[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Article {
@@ -104,15 +110,17 @@ model Favorite {
 }
 
 model ShoppingListItem {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String                 @id @default(cuid())
+  userId     String
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  text      String
-  checked   Boolean  @default(false)
+  text       String
+  checked    Boolean                @default(false)
+  sourceType ShoppingListSourceType @default(MANUAL)
+  sourceId   String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model MealPlan {
@@ -122,25 +130,25 @@ model MealPlan {
   weekStartDate DateTime
   items         MealPlanItem[]
 
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, weekStartDate])
 }
 
 model MealPlanItem {
-  id          String    @id @default(cuid())
-  mealPlanId  String
-  mealPlan    MealPlan  @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
-  planDate    DateTime
-  slot        MealSlot
-  slotIndex   Int       @default(1)
-  recipeId    String
-  recipe      Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  servings    Int       @default(1)
+  id         String    @id @default(cuid())
+  mealPlanId String
+  mealPlan   MealPlan  @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  planDate   DateTime
+  slot       MealSlot
+  slotIndex  Int       @default(1)
+  recipeId   String
+  recipe     Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  servings   Int       @default(1)
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@unique([mealPlanId, planDate, slot, slotIndex])
 }
