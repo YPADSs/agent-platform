@@ -5,12 +5,18 @@ export function getSiteBaseUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 }
 
+export function getAbsoluteUrl(path: string) {
+  return `${getSiteBaseUrl()}${path}`;
+}
+
 export function getLocaleAlternates(path: string) {
   const languages: Record<string, string> = {};
+
   for (const locale of locales) {
-    languages[locale] = `${getSiteBaseUrl()}/${locale}${path}`;
+    languages[locale] = getAbsoluteUrl(`/${locale}${path}`);
   }
-  languages['x-xdefault'] = `${getSiteBaseUrl()}/${defaultLocale}${path}`;
+
+  languages['x-default'] = getAbsoluteUrl(`/${defaultLocale}${path}`);
   return languages;
 }
 
@@ -37,6 +43,25 @@ export function getLocaleRootMetadata(locale: Locale): Metadata {
     alternates: {
       languages: getLocaleAlternates(''),
     },
-    openGraph: {locale},
+    openGraph: { locale },
   };
+}
+
+export function getContentDetailAlternates(
+  section: 'recipes' | 'articles',
+  slug: string,
+) {
+  return getLocaleAlternates(`/${section}/${slug}`);
+}
+
+export function getContentDetailCanonical(
+  section: 'recipes' | 'articles',
+  slug: string,
+  locale?: Locale,
+) {
+  const path = locale
+    ? `/${locale}/${section}/${slug}`
+    : `/${section}/${slug}`;
+
+  return getAbsoluteUrl(path);
 }

@@ -1,11 +1,21 @@
-import {notFound} from 'next/navigation';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import ViewTracker from '@/components/ViewTracker';
 import RecipeActions from '@/components/RecipeActions';
-import {getRecipeDetail} from '@/lib/recipes';
+import { getRecipeDetail } from '@/lib/recipes';
+import {
+  getAbsoluteUrl,
+  getContentDetailAlternates,
+  getContentDetailCanonical,
+} from '@/lib/seo';
 
 type RecipeDetailPageProps = {
-  params: {slug: string};
-  searchParams?: {servings?: string};
+  params: { slug: string };
+  searchParams?: { servings?: string };
+};
+
+type RecipeMetadataProps = {
+  params: { slug: string };
 };
 
 function parseServings(value?: string): number | undefined {
@@ -17,9 +27,37 @@ function parseServings(value?: string): number | undefined {
   return parsed;
 }
 
+export async function generateMetadata({ params }: RecipeMetadataProps): Promise<Metadata> {
+  const recipe = await getRecipeDetail(params.slug);
+
+  if (!recipe) {
+    return {
+      title: 'Recipe not found',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const canonical = getContentDetailCanonical('recipes', recipe.slug);
+
+  return {
+    title: recipe.title,
+    description: recipe.description,
+    alternates: {
+      canonical,
+      languages: getContentDetailAlternates('recipes', recipe.slug),
+    },
+    openGraph: {
+      title: recipe.title,
+      description: recipe.description,
+      url: canonical,
+      type: 'article',
+    },
+  };
+}
+
 export default async function RecipeDetailPage({
   params,
-  searchParams
+  searchParams,
 }: RecipeDetailPageProps) {
   const servings = parseServings(searchParams?.servings);
   const recipe = await getRecipeDetail(params.slug, servings);
@@ -31,7 +69,7 @@ export default async function RecipeDetailPage({
     '@type': 'Recipe',
     name: recipe.title,
     description: recipe.description,
-    url: `/recipes/${recipe.slug}`
+    url: getAbsoluteUrl(`/recipes/${recipe.slug}`),
   };
 
   return (
@@ -39,7 +77,7 @@ export default async function RecipeDetailPage({
       <ViewTracker kind="recipe" slug={recipe.slug} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{__html: JSON.stringify(schema)}}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <article className="recipeDetail">
         <header className="recipeHero">
@@ -51,7 +89,7 @@ export default async function RecipeDetailPage({
         <div className="recipeMetaGrid">
           <section className="panel">
             <h2>Nutrition</h2>
-            <dl className="nutritionMini nutritionFull">
+            <dl className="nutritionMini">
               <div>
                 <dt>Calories</dt>
                 <dd>{recipe.nutrition.calories}</dd>

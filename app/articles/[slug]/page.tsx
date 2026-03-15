@@ -1,10 +1,48 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import {notFound} from 'next/navigation';
+import { notFound } from 'next/navigation';
 import ViewTracker from '@/components/ViewTracker';
 import ArticleActions from '@/components/ArticleActions';
-import {getArticleDetail} from '@/lib/articles';
+import { getArticleDetail } from '@/lib/articles';
+import {
+  getAbsoluteUrl,
+  getContentDetailAlternates,
+  getContentDetailCanonical,
+} from '@/lib/seo';
 
-export default async function ArticleDetailPage({params}: {params: {slug: string}}) {
+type ArticleDetailPageProps = {
+  params: { slug: string };
+};
+
+export async function generateMetadata({ params }: ArticleDetailPageProps): Promise<Metadata> {
+  const article = await getArticleDetail(params.slug);
+
+  if (!article) {
+    return {
+      title: 'Article not found',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const canonical = getContentDetailCanonical('articles', article.slug);
+
+  return {
+    title: article.title,
+    description: article.description,
+    alternates: {
+      canonical,
+      languages: getContentDetailAlternates('articles', article.slug),
+    },
+    openGraph: {
+      title: article.title,
+      description: article.description,
+      url: canonical,
+      type: 'article',
+    },
+  };
+}
+
+export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
   const article = await getArticleDetail(params.slug);
   if (!article) return notFound();
 
@@ -13,7 +51,7 @@ export default async function ArticleDetailPage({params}: {params: {slug: string
     '@type': 'Article',
     headline: article.title,
     articleBody: article.body,
-    url: `/articles/${article.slug}`
+    url: getAbsoluteUrl(`/articles/${article.slug}`),
   };
 
   return (
@@ -21,7 +59,7 @@ export default async function ArticleDetailPage({params}: {params: {slug: string
       <ViewTracker kind="article" slug={article.slug} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{__html: JSON.stringify(schema)}}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <article className="recipeDetail">
         <header className="recipeHero">
