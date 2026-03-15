@@ -4,8 +4,14 @@ import PlannerCalendar from '@/components/PlannerCalendar';
 import { requirePremium } from '@/lib/premium';
 import { requireSession } from '@/lib/session';
 import { getUserPreferencesByEmail } from '@/lib/preferences';
+import { withLocale } from '@/lib/locale-path';
 
-export default async function PlannerPage() {
+type PlannerPageProps = {
+  params?: { locale?: string };
+};
+
+export default async function PlannerPage({ params }: PlannerPageProps) {
+  const locale = params?.locale;
   let preferences: Awaited<ReturnType<typeof getUserPreferencesByEmail>> | null = null;
 
   try {
@@ -31,8 +37,8 @@ export default async function PlannerPage() {
         <h1>Meal Planner (Premium)</h1>
         <p>This feature requires Premium. Server-side gating is enforced.</p>
         <div className="filterActions">
-          <Link href="/account">Go to Account</Link>
-          <Link href="/account/onboarding">
+          <Link href={withLocale(locale, '/account')}>Go to Account</Link>
+          <Link href={withLocale(locale, '/account/onboarding')}>
             {showOnboardingCta ? 'Complete Sprint 4 setup' : 'Review setup'}
           </Link>
         </div>
@@ -59,7 +65,7 @@ export default async function PlannerPage() {
             Confirm your goal, language, and units before you rely on the full weekly
             planner experience.
           </p>
-          <Link href="/account/onboarding">Open onboarding</Link>
+          <Link href={withLocale(locale, '/account/onboarding')}>Open onboarding</Link>
         </section>
       ) : null}
 
