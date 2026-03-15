@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { requireSession } from '@/lib/session';
-import { getAccountStatusByEmail } from '@/lib/billing';
 import AccountPreferencesPanel from '@/components/AccountPreferencesPanel';
+import TrackedSubmitButton from '@/components/TrackedSubmitButton';
+import { getAccountStatusByEmail } from '@/lib/billing';
 import { getUserPreferencesByEmail } from '@/lib/preferences';
+import { requireSession } from '@/lib/session';
 
 export default async function AccountPage() {
   try {
@@ -99,7 +100,13 @@ export default async function AccountPage() {
             <div className="filterActions">
               {showCheckout ? (
                 <form action="/api/billing/checkout" method="POST">
-                  <button type="submit">Start Premium checkout</button>
+                  <TrackedSubmitButton
+                    type="submit"
+                    eventName="checkout_started"
+                    eventProps={{ surface: 'account', plan: 'premium' }}
+                  >
+                    Start Premium checkout
+                  </TrackedSubmitButton>
                 </form>
               ) : (
                 <p className="statusMessage">You already have Premium access.</p>

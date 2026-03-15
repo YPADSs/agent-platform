@@ -3,6 +3,12 @@ export type AnalyticsEventName =
   | 'search_performed'
   | 'content_viewed'
   | 'checkout_started'
+  | 'planner_viewed'
+  | 'planner_week_changed'
+  | 'planner_recipe_search'
+  | 'planner_item_added'
+  | 'planner_item_removed'
+  | 'paywall_viewed';
 
 export type AnalyticsEvent = {
   name: AnalyticsEventName;
