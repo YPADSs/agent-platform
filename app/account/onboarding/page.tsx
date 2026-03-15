@@ -1,8 +1,15 @@
 import Link from 'next/link';
-import { requireSession } from '@/lib/session';
 import OnboardingPreferencesFlow from '@/components/OnboardingPreferencesFlow';
+import { withLocale } from '@/lib/locale-path';
+import { requireSession } from '@/lib/session';
 
-export default async function AccountOnboardingPage() {
+type AccountOnboardingPageProps = {
+  params?: { locale?: string };
+};
+
+export default async function AccountOnboardingPage({ params }: AccountOnboardingPageProps) {
+  const locale = params?.locale;
+
   try {
     await requireSession();
   } catch {
@@ -13,8 +20,8 @@ export default async function AccountOnboardingPage() {
           <p>Sign in to confirm your core Sprint 4 preferences.</p>
         </div>
         <div className="filterActions">
-          <Link href="/account/login">Log in</Link>
-          <Link href="/account/register">Create an account</Link>
+          <Link href={withLocale(locale, '/account/login')}>Log in</Link>
+          <Link href={withLocale(locale, '/account/register')}>Create an account</Link>
         </div>
       </div>
     );
