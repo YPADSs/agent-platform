@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { withLocale } from '@/lib/locale-path';
 
 type Favorite = {
   targetType: 'RECIPE' | 'ARTICLE';
@@ -15,7 +17,19 @@ type Favorite = {
   } | null;
 };
 
+function getLocalizedHref(locale: string | undefined, href: string | undefined) {
+  if (!href) return undefined;
+  if (!locale) return href;
+  if (!href.startsWith('/')) return href;
+  if (href === `/${locale}` || href.startsWith(`/${locale}/`)) {
+    return href;
+  }
+  return withLocale(locale, href);
+}
+
 export default function FavoritesPage() {
+  const params = useParams<{ locale?: string }>();
+  const locale = typeof params?.locale === "string" ? params.locale : undefined;
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [linkReady, setLinkReady] = useState(false);
@@ -62,7 +76,8 @@ export default function FavoritesPage() {
           <p>{err}</p>
           {linkReady ? (
             <p>
-              <Link href="/account/login">Log in</Link> {' '}or <Link href="/account/register">create an account</Link>
+              <Link href={withLocale(locale, '/account/login')}>Log in</Link> {' '}or {' '}
+              <Link href={withLocale(locale, '/account/register')}>create an account</Link>
               to sync favorites.
             </p>
           ) : null}
@@ -71,21 +86,25 @@ export default function FavoritesPage() {
         <p className="resultsMeta">Loading favorites...</p>
       ) : favorites.length ? (
         <ul className="recipeGrid">
-          {favorites.map((f) => (
-            <li key={`${f.targetType}:${f.targetSlug}`} className="recipeCard">
-              <div className="recipeCardHeader">
-                <p className="badg">{f.targetType === 'RECIPE' ? 'Recipe' : 'Article'}</p>
-              </div>
-              <h2>
-                {f.target?.href ? <Link href={f.target.href}>{f.target.title}</Link> : f.targetSlug}
-              </h2>
-              <p>{f.target?.description ?? 'Saved content.'}</p>
-              <div className="filterActions">
-                {f.target?.href ? <Link className="cardLink" href={f.target.href}>Open</Link> : null}
-                <button type="button" onClick={() => removeFavorite(f)}>Remove</button>
-              </div>
-            </li>
-          ))}
+          {favorites.map((f) => {
+            const targetHREF = getLocalizedHref(locale, f.target?.href);
+
+            return (
+              <li key={`${f.targetType}:${f.targetSlug}`} className="recipeCard">
+                <div className="recipeCardHeader">
+                  <p className="badge">{f.targetType === 'RECIPE' ? 'Recipe' : 'Article'}</p>
+                </div>
+                <h2>
+                  {targetHREF ? <Link href={targetHREF}>{f.target?.title}</Link> : f.targetSlug}
+                </h2>
+                <p>{f.target?.description ?? 'Saved content.'}</p>
+                <div className="filterActions">
+                  {targetHREF ? <Link className="cardLink" href={targetHREF}>Open</Link> : null}
+                  <button type="button" onClick={() => removeFavorite(f)}>Remove</button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <div className="emptyState">
