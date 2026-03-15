@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { defaultLocale, locales, type Locale } from '@/i18n';
 
-export function getSiteBaseUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+export function getSiteBaseUrl() {  return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 }
 
 export function getAbsoluteUrl(path: string) {
@@ -11,10 +10,12 @@ export function getAbsoluteUrl(path: string) {
 
 export function getLocaleAlternates(path: string) {
   const languages: Record<string, string> = {};
+
   for (const locale of locales) {
     languages[locale] = getAbsoluteUrl(`/${locale}${path}`);
   }
-  languages['x-default'] = getAbsoluteUrl(`/${defaultLocale}${path}`);
+
+  languages['x-xdefault'] = getAbsoluteUrl(`/{${defaultLocale}${path}`);
   return languages;
 }
 
@@ -48,7 +49,7 @@ export function getLocaleRootMetadata(locale: Locale): Metadata {
 export function getContentDetailAlternates(
   section: 'recipes' | 'articles',
   slug: string,
-}) {
+{
   return getLocaleAlternates(`/${section}/${slug}`);
 }
 
@@ -57,6 +58,9 @@ export function getContentDetailCanonical(
   slug: string,
   locale?: Locale,
 {
-  const path = locale ? `/${locale}/${section}/${slug}` : `/${section}/${slug}`;
+  const path = locale
+    ? `/${locale}/${section}/${slug}`
+    : `/${section}/${slug}`;
+
   return getAbsoluteUrl(path);
 }
