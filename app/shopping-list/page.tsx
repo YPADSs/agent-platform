@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
+import { withLocale } from '@/lib/locale-path';
 
 type ManualItem = {
   id: string;
@@ -20,6 +21,10 @@ type PlannerShoppingItem = {
 type PlannerShoppingList = {
   unitSystem: 'metric' | 'imperial' | string;
   items: PlannerShoppingItem[];
+};
+
+type ShoppingListPageProps = {
+  params?: { locale?: string };
 };
 
 function startOfWeek(date: Date) {
@@ -44,7 +49,8 @@ function formatDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-export default function ShoppingListPage() {
+export default function ShoppingListPage({ params }: ShoppingListPageProps) {
+  const locale = params?.locale;
   const [items, setItems] = useState<ManualItem[]>([]);
   const [text, setText] = useState('');
   const [err, setErr] = useState<string | null>(null);
@@ -174,8 +180,7 @@ export default function ShoppingListPage() {
       <div className="pageIntro">
         <h1>Shopping list</h1>
         <p>
-          Add ingredients manually or review the planner-linked weekly aggregation. Unit continuity stays
-          aligned with your current preferences where planner aggregation is available.
+          Add ingredients manually or review the planner-linked weekly aggregation. Unit continuity stays aligned with your current preferences where planner aggregation is available.
         </p>
       </div>
 
@@ -222,24 +227,24 @@ export default function ShoppingListPage() {
               <div className="emptyState">
                 <p>No planner meals for this week yet. Add meals in the planner to see aggregated ingredients.</p>
                 <div className="filterActions">
-                  <Link href="/planner">Open planner</Link>
+                  <Link href={withLocale(locale, '/planner')}>Open planner</Link>
                 </div>
               </div>
-            )}
+            )
           </>
         ) : null}
 
         {!plannerLoading && plannerPremiumRequired ? (
           <div className="filterActions">
-            <Link href="/account">Upgrade to Premium</Link>
-            <Link href="/planner">Review planner</Link>
+            <Link href={withLocale(locale, '/account')}>Upgrade to Premium</Link>
+            <Link href={withLocale(locale, '/planner')}>Review planner</Link>
           </div>
         ) : null}
 
         {!plannerLoading && !plannerAuthenticated ? (
           <div className="filterActions">
-            <Link href="/account/login">Log in</Link>
-            <Link href="/account/register">Create an account</Link>
+            <Link href={withLocale(locale, '/account/login')}>Log in</Link>
+            <Link href={withLocale(locale, '/account/register')}>Create an account</Link>
           </div>
         ) : null}
       </section>
@@ -249,8 +254,8 @@ export default function ShoppingListPage() {
           <p>{err}</p>
           {linkReady ? (
             <p>
-              <Link href="/account/login">Log in</Link>{' '}or{' '}
-              <Link href="/account/register">create an account</Link>{' '}to save your shopping list.
+              <Link href={withLocale(locale, '/account/login')}>Log in</Link>{' '}or{' '}
+              <Link href={withLocale(locale, '/account/register')}>create an account</Link>{' '}to save your shopping list.
             </p>
           ) : null}
         </div>
