@@ -2,7 +2,7 @@
 body{margin:0;padding:0}
 .header{position:sticky;top:0;background:#fff;border-bottom:1px solid #eee}
 .nav{display:flex;gap:12px;flex-wrap:wrap;padding:12px}
-.navLink{text-decoration:none;color:#111}
+.navLink {text-decoration:none;color:#111}
 .main{padding:16px;max-width:960px;margin:0 auto}
 .footer{padding:16px;border-top:1px solid #eee;max-width:960px;margin:0 auto}
 .pageIntro{margin-bottom:16px}
@@ -34,8 +34,24 @@ body{margin:0;padding:0}
 .ingredientList,.stepsList{padding-left:20px;margin:0;display:grid;gap:10px}
 .ingredientList li{display:grid;gap:4px}
 .emptyState{border:1px dashed #ccc;border-radius:16px;padding:20px}
+.plannerLayout{display:grid;gap:16px}
+.plannerSidebar{display:grid;gap:16px}
+.plannerHeaderRow,.plannerSlotHeader,.plannerDayHeader,.plannerSidebarHeader{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.plannerWeekControls{display:flex;gap:8px;flex-wrap:wrap}
+.plannerWeekControls button,.plannerSlotHeader button,.plannerItemRow button,.plannerRecipeResult button{padding:10px 12px;border:1px solid #ccc;border-radius:10px;background:#fff}
+.plannerGrid,.plannerSlots,.plannerComposer,.plannerWarnings{display:grid;gap:12px}
+.plannerDayCard,.plannerSlotCard{border:1px solid #e8e8e8;border-radius:16px;padding:12px;background:#fafafa}
+.plannerItemList,.plannerRecipeResults{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.plannerItemRow,.plannerRecipeResult{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.plannerSummaryGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+.plannerSummaryGrid div{padding:10px;border:1px solid #eee;border-radius:10px}
+.plannerSummaryGrid dt{font-size:12px;color:#555}
+.plannerSummaryGrid dd{margin:4px 0 0;font-weight:600}
 @media (min-width: 720px){
   .recipesFilters{grid-template-columns:repeat(2,minmax(0,1fr))}
   .recipeGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .recipeMetaGrid,.recipeColumns{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (min-width: 960px){
+  .plannerLayout{grid-template-columns:minmax(0,2fr) minmax(280px,1fr)}
 }
