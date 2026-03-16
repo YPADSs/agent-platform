@@ -2,10 +2,17 @@ import Link from 'next/link';
 import AccountPreferencesPanel from '@/components/AccountPreferencesPanel';
 import TrackedSubmitButton from '@/components/TrackedSubmitButton';
 import { getAccountStatusByEmail } from '@/lib/billing';
+import { withLocale } from '@/lib/locale-path';
 import { getUserPreferencesByEmail } from '@/lib/preferences';
 import { requireSession } from '@/lib/session';
 
-export default async function AccountPage() {
+type AccountPageProps = {
+  params?: { locale?: string };
+};
+
+export default async function AccountPage({ params }: AccountPageProps) {
+  const locale = params?.locale;
+
   try {
     const session = await requireSession();
     const email = session.user?.email;
@@ -21,8 +28,8 @@ export default async function AccountPage() {
             <p>Please log in to view your account.</p>
             <p>Create an account to save favorites, build a shopping list, and manage Premium.</p>
             <div className="filterActions">
-              <Link href="/account/login">Log in</Link>
-              <Link href="/account/register">Create an account</Link>
+              <Link href={withLocale(locale, '/account/login')}>Log in</Link>
+              <Link href={withLocale(locale, '/account/register')}>Create an account</Link>
             </div>
           </div>
         </div>
@@ -33,6 +40,7 @@ export default async function AccountPage() {
       getAccountStatusByEmail(email),
       getUserPreferencesByEmail(email),
     ]);
+
     if (!account) {
       return (
         <div className="recipesPage">
@@ -58,7 +66,7 @@ export default async function AccountPage() {
             <h2>Complete your Sprint 4 setup</h2>
             <p>Confirm your goal, language, and units so planner and shopping-list experiences can reuse the same settings.</p>
             <div className="filterActions">
-              <Link href="/account/onboarding">Finish onboarding</Link>
+              <Link href={withLocale(locale, '/account/onboarding')}>Finish onboarding</Link>
             </div>
           </section>
         ) : null}
@@ -68,7 +76,7 @@ export default async function AccountPage() {
             <h2>Profile</h2>
             <p><strong>Email:</strong> {account.user.email}</p>
             <p><strong>Role:</strong> {account.user.role}</p>
-            <p><strong>Subscription status:</strong> {account.subscription.status} </p>
+            <p><strong>Subscription status:</strong> {account.subscription.status}</p>
             <p><strong>Premium:</strong> {premiumLabel}</p>
             <p><strong>Onboarding:</strong> {preferences.onboardingStatus}</p>
             {account.subscription.currentPeriodEnd ? (
@@ -85,12 +93,13 @@ export default async function AccountPage() {
           <section className="panel">
             <h2>MVP tools</h2>
             <ul className="ingredientList">
-              <li><Link href="/favorites">Open favorites</Link></li>
-              <li><Link href="/shopping-list">Open shopping list</Link></li>
+              <li><Link href={withLocale(locale, '/favorites')}>Open favorites</Link></li>
+              <li><Link href={withLocale(locale, '/shopping-list')}>Open shopping list</Link></li>
               <li>
-                <Link href="/planner">Open meal planner</Link>{' '}<small className="muted">Premium-gated STRINT 4 entry point.</small>
+                <Link href={withLocale(locale, '/planner')}>Open meal planner</Link>{' '}
+                <small className="muted">Premium-gated SPRINT 4 entry point.</small>
               </li>
-              <li><Link href="/account/onboarding">Complete Sprint 4 setup</Link></li>
+              <li><Link href={withLocale(locale, '/account/onboarding')}>Complete Sprint 4 setup</Link></li>
             </ul>
           </section>
 
@@ -127,8 +136,8 @@ export default async function AccountPage() {
           <p>Please log in to view your account.</p>
         </div>
         <div className="filterActions">
-          <Link href="/account/login">Log in</Link>
-          <Link href="/account/register">Create an account</Link>
+          <Link href={withLocale(locale, '/account/login')}>Log in</Link>
+          <Link href={withLocale(locale, '/account/register')}>Create an account</Link>
         </div>
       </div>
     );

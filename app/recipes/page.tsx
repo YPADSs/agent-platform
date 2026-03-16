@@ -1,7 +1,9 @@
 import Link from 'next/link';
-import { listRecipeSummaries } from '@/lib/recipes';
+import {listRecipeSummaries} from '@/lib/recipes';
+import {withLocale} from '@/lib/locale-path';
 
 type RecipesPageProps = {
+  params?: {locale?: string};
   searchParams?: {
     q?: string;
     mealType?: string;
@@ -10,17 +12,18 @@ type RecipesPageProps = {
 };
 
 const mealTypeOptions = [
-  { value: '', label: 'All meal types' },
-  { value: 'breakfast', label: 'Breakfast' },
-  { value: 'lunch', label: 'Lunch' },
-  { value: 'dinner', label: 'Dinner' },
-  { value: 'salad', label: 'Salad' },
-  { value: 'soup', label: 'Soup' },
-  { value: 'snack', label: 'Snack' },
-  { value: 'dessert', label: 'Dessert' },
+  {value: '', label: 'All meal types'},
+  {value: 'breakfast', label: 'Breakfast'},
+  {value: 'lunch', label: 'Lunch'},
+  {value: 'dinner', label: 'Dinner'},
+  {value: 'salad', label: 'Salad'},
+  {value: 'soup', label: 'Soup'},
+  {value: 'snack', label: 'Snack'},
+  {value: 'dessert', label: 'Dessert'},
 ];
 
-export default async function RecipesPage({ searchParams }: RecipesPageProps) {
+export default async function RecipesPage({params, searchParams}: RecipesPageProps) {
+  const locale = params?.locale;
   const q = searchParams?.q?.trim() ?? '';
   const mealType = searchParams?.mealType?.trim() ?? '';
   const ingredients = searchParams?.ingredients?.trim() ?? '';
@@ -60,7 +63,11 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
 
         <label className="field">
           <span>Meal type</span>
-          <select name="mealType" defaultValue={mealType} aria-label="Filter by meal type">
+          <select
+            name="mealType"
+            defaultValue={mealType}
+            aria-label="Filter by meal type"
+          >
             {mealTypeOptions.map((option) => (
               <option key={option.value || 'all'} value={option.value}>
                 {option.label}
@@ -70,7 +77,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
         </label>
 
         <label className="field fieldWide">
-          <span>Ingredients (1–3, comma separated)</span>
+          <span>Ingredients (1-3, comma separated)</span>
           <input
             name="ingredients"
             defaultValue={ingredients}
@@ -81,13 +88,13 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
 
         <div className="filterActions">
           <button type="submit">Apply filters</button>
-          <Link href="/recipes">Reset</Link>
+          <Link href={withLocale(locale, '/recipes')}>Reset</Link>
         </div>
       </form>
 
       <p className="resultsMeta">
         {recipes.length} result{recipes.length === 1 ? '' : 's'}
-        {ingredientList.length ? ` • ingredient match: ${ingredientList.join(', ')}` : ''}
+        {ingredientList.length ? ` - ingredient match: ${ingredientList.join(', ')}` : ''}
       </p>
 
       {recipes.length ? (
@@ -100,7 +107,9 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
               </div>
 
               <h2>
-                <Link href={`/recipes/${recipe.slug}`}>{recipe.title}</Link>
+                <Link href={withLocale(locale, `/recipes/${recipe.slug}`)}>
+                  {recipe.title}
+                </Link>
               </h2>
               <p>{recipe.description}</p>
 
@@ -125,10 +134,13 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
 
               <p className="muted">
                 Ingredients: {recipe.ingredientNames.slice(0, 4).join(', ')}
-                {recipe.ingredientNames.length > 4 ? '…' : ''}
+                {recipe.ingredientNames.length > 4 ? '...' : ''}
               </p>
 
-              <Link className="cardLink" href={`/recipes/${recipe.slug}`}>
+              <Link
+                className="cardLink"
+                href={withLocale(locale, `/recipes/${recipe.slug}`)}
+              >
                 Open recipe
               </Link>
             </li>
