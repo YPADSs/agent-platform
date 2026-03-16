@@ -329,7 +329,7 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
             <div className="emptyState">
               <h2>Your shopping list is empty</h2>
               <p>
-                Add items manually or use "Add ingredients to shopping list" from a
+                Add items manually or use &lquot;Add ingredients to shopping list&rquot; from a
                 recipe.
               </p>
             </div>
