@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useParams, useState, type FormEvent } from 'react';
+import { useParams } from 'next/navigation';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { withLocale } from '@/lib/locale-path';
 
 const LOCALE_OPTIONS = [
@@ -47,7 +48,7 @@ const DEFAULT_ENTITLEMENTS: Entitlements = {
 
 export default function OnboardingPreferencesFlow() {
   const params = useParams<{ locale?: string }>();
-  const visitingLocale = typeof params?.locale === "string" ? params.locale : undefined;
+  const visitingLocale = typeof params?.locale === 'string' ? params.locale : undefined;
   const [preferences, setPreferences] = useState<Preferences>(DEFAULT_PREFERENCES);
   const [entitlements, setEntitlements] = useState<Entitlements>(DEFAULT_ENTITLEMENTS);
   const [loading, setLoading] = useState(true);
@@ -285,7 +286,9 @@ export default function OnboardingPreferencesFlow() {
         </ul>
         <div className="filterActions">
           <Link href={withLocale(activeLocale, '/account')}>Go to Account</Link>
-          <Link href={withLocale(activeLocale, '/planner')}>{isCompleted ? 'Go to Planner' : 'View Planner status'}</Link>
+          <Link href={withLocale(activeLocale, '/planner')}>
+            {isCompleted ? 'Go to Planner' : 'View Planner status'}
+          </Link>
         </div>
       </section>
     </div>
