@@ -46,11 +46,17 @@ enum MealSlot {
   SNACK
 }
 
+enum PantryItemSource {
+  MANUAL
+  SHOPPING_LIST
+  PLANNER
+}
+
 model User {
-  id               String  @id @default(cuid())
-  email            String  @unique
+  id               String @id @default(cuid())
+  email            String @unique
   passwordHash     String
-  role             Role    @default(USER)
+  role             Role   @default(USER)
 
   // Stripe linkage (optional until first checkout)
   stripeCustomerId String? @unique
@@ -61,6 +67,7 @@ model User {
 
   favorites     Favorite[]
   shoppingItems ShoppingListItem[]
+  pantryItems   PantryItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -69,34 +76,34 @@ model User {
 model UserPreferences {
   id                     String           @id @default(cuid())
   userId                 String           @unique
-  user                   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  goalCode               String?
-  locale                 Locale           @default(EN)
-  unitSystem             UnitSystem       @default(METRIC)
-  onboardingStatus       OnboardingStatus @default(NOT_STARTED)
-  onboardingCompletedAt  DateTime?
+  goalCode              String?
+  locale                Locale          @default(EN)
+  unitSystem            UnitSystem     @default(METRIC)
+  onboardingStatus      OnboardingStatus @default(NOT_STARTED)
+  onboardingCompletedAt DateTime?
 
-  createdAt              DateTime         @default(now())
-  updatedAt              DateTime         @updatedAt
+  createdAt              DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
 }
 
 model Subscription {
-  id                   String             @id @default(cuid())
-  userId               String             @unique
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                   String           @id @default(cuid())
+  userId                String           @unique
+  user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   stripeSubscriptionId String?            @unique
   status               SubscriptionStatus @default(INACTIVE)
   currentPeriodEnd     DateTime?
 
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
 }
 
 model BillingEvent {
   id            String   @id @default(cuid())
-  stripeEventId String   @unique
+  stripeEventId String  @unique
   type          String
   receivedAt    DateTime @default(now())
   processedAt   DateTime?
@@ -151,10 +158,47 @@ model ShoppingListItem {
   updatedAt DateTime @updatedAt
 }
 
+model IngredientCatalog {
+  id         String           @id @default(cuid())
+  key        String           @unique
+  defaultName String
+  categoryKey String?
+  pantryItems PantryItem[]
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([categoryKey])
+}
+
+model PantryItem {
+  id             String           @id @default(cuid())
+  userId        String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ingredientId String
+  ingredient    IngredientCatalog @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  quantity       Decimal?         @db.Decimal(10, 2)
+  unit         String?
+  source        PantryItemSource @default(MANUAL)
+  sourceRefId   String?
+  displayName   String?
+  note          String?
+  lastConfirmedAt DateTime?
+
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([userId, ingredientId])
+  @@index([userId, updatedAt])
+  @@index([ingredientId])
+  @@index([source, sourceRefId])
+}
+
 model MealPlan {
   id            String         @id @default(cuid())
   userId        String
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   weekStartDate DateTime
   items         MealPlanItem[]
 
