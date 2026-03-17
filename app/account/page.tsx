@@ -95,13 +95,14 @@ export default async function AccountPage({ params }: AccountPageProps) {
             <ul className="ingredientList">
               <li><Link href={withLocale(locale, '/favorites')}>Open favorites</Link></li>
               <li><Link href={withLocale(locale, '/shopping-list')}>Open shopping list</Link></li>
+              <li><Link href={withLocale(locale, '/pantry')}>Open pantry</Link></li>
               <li>
                 <Link href={withLocale(locale, '/planner')}>Open meal planner</Link>{' '}
                 <small className="muted">Premium-gated SPRINT 4 entry point.</small>
               </li>
               <li><Link href={withLocale(locale, '/account/onboarding')}>Complete Sprint 4 setup</Link></li>
             </ul>
-          </section>
+          </section
 
           <section className="panel">
             <h2>Premium access</h2>
