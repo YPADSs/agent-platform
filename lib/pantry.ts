@@ -1,4 +1,4 @@
-import { PantryItemSource, type Prisma } from '@prisma/client';
+import { PantryItemSource, Prisma } from '@prisma/client';
 import { getPrisma } from '@/lib/prisma';
 
 type PatchPantryInput = {
@@ -24,28 +24,30 @@ export type PantryItemSummary = {
   updatedAt: string;
 };
 
-function pantryItemSelect() {
-  return {
-    id: true,
-    ingredientId: true,
-    quantity: true,
-    unit: true,
-    source: true,
-    sourceRefId: true,
-    displayName: true,
-    note: true,
-    lastConfirmedAt: true,
-    updatedAt: true,
-    ingredient: {
-      select: {
-        key: true,
-        defaultName: true,
-      },
-    },
-  } satisfies Prisma.PantryItemSelect;
-}
+const pantryItemSelect = {
+  id: true,
+  ingredientId: true,
+  quantity: true,
+  unit: true,
+  source: true,
+  sourceRefId: true,
+  displayName: true,
+  note: true,
+  lastConfirmedAt: true,
+  updatedAt: true,
+  ingredient: {
 
-type PantryRow = Awaited<returnType<typeof getPantryByEmail>>[number];
+    select: {
+
+      key: true,
+      defaultName: true,
+    },
+  },
+} satisfies Prisma.PantryItemSelect;
+
+type PantryRow = Prisma.PantryItemGetPayload<{
+  select: typeof pantryItemSelect;
+}>;
 
 function toSummary(item: PantryRow): PantryItemSummary {
   return {
@@ -72,7 +74,7 @@ export function toIngredientKey(value: string) {
   return normalizeText(value)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-+|g$/g, '');
+    .replace(/\-~$/g, '');
 }
 
 async function getUserIdByEmail(email: string) {
@@ -97,13 +99,16 @@ export async function getPantryByEmail(email: string) {
   const items = await prisma.pantryItem.findMany({
     where: { userId },
     orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }],
-    select: pantryItemSelect(),
+    select: pantryItemSelect,
   });
 
   return items.map(toSummary);
 }
 
-export async function createPantryItemByEmail(email: string, input: { name: string; quantity?: null | number; unit?: null | string; note?: null | string }) {
+export async function createPantryItemByEmail(
+  email: string,
+  input: { name: string; quantity?: null | number; unit?: null | string; note?: null | string },
+{
   const prisma = getPrisma();
   const userId = await getUserIdByEmail(email);
   const displayName = normalizeText(input.name);
@@ -126,7 +131,12 @@ export async function createPantryItemByEmail(email: string, input: { name: stri
   });
 
   const existing = await prisma.pantryItem.findUnique({
-    where: { userId_ingredientId: { userId, ingredientId: ingredient.id } },
+    where: {
+      userId_ingredientId: {
+        userId,
+        ingredientId: ingredient.id,
+      },
+    },
     select: { id: true },
   });
 
@@ -140,13 +150,15 @@ export async function createPantryItemByEmail(email: string, input: { name: stri
     data: {
       userId,
       ingredientId: ingredient.id,
-      quantity: input.quantity === null || input.quantity === undefined ? null : new Prisma.Decimal(input.quantity),
+      quantity: input.quantity === null || input.quantity === undefined
+        ? null
+        : new Prisma.Decimal(input.quantity),
       unit: input.unit ?? null,
       displayName,
       note: input.note ?? null,
       source: PantryItemSource.MANUAL,
     },
-    select: pantryItemSelect(),
+    select: pantryItemSelect,
   });
 
   return toSummary(item);
@@ -171,14 +183,16 @@ export async function updatePantryItemByEmail(email: string, itemId: string, inp
     where: { id: itemId },
     data: {
       ...(input.quantity !== undefined
-        ? { quantity: input.quantity === null ? null : new Prisma.Decimal(input.quantity) }
+        ? {
+            quantity: input.quantity === null ? null : new Prisma.Decimal(input.quantity),
+          }
         : {}),
       ...(input.unit !== undefined ? { unit: input.unit } : {}),
       ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
       ...(input.note !== undefined ? { note: input.note } : {}),
       ...(input.lastConfirmedAt !== undefined ? { lastConfirmedAt: input.lastConfirmedAt } : {}),
     },
-    select: pantryItemSelect(),
+    select: pantryItemSelect,
   });
 
   return toSummary(item);
@@ -199,5 +213,7 @@ export async function deletePantryItemByEmail(email: string, itemId: string) {
     throw error;
   }
 
-  await prisma.pantryItem.delete({ where: { id: itemId } });
+  await prisma.pantryItem.delete({
+    where: { id: itemId },
+  });
 }
