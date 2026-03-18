@@ -36,9 +36,7 @@ const pantryItemSelect = {
   lastConfirmedAt: true,
   updatedAt: true,
   ingredient: {
-
     select: {
-
       key: true,
       defaultName: true,
     },
@@ -73,8 +71,8 @@ function normalizeText(value: string) {
 export function toIngredientKey(value: string) {
   return normalizeText(value)
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/\-~$/g, '');
+    .replace(/^[a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 async function getUserIdByEmail(email: string) {
@@ -108,7 +106,7 @@ export async function getPantryByEmail(email: string) {
 export async function createPantryItemByEmail(
   email: string,
   input: { name: string; quantity?: null | number; unit?: null | string; note?: null | string },
-{
+) {
   const prisma = getPrisma();
   const userId = await getUserIdByEmail(email);
   const displayName = normalizeText(input.name);
@@ -150,9 +148,10 @@ export async function createPantryItemByEmail(
     data: {
       userId,
       ingredientId: ingredient.id,
-      quantity: input.quantity === null || input.quantity === undefined
-        ? null
-        : new Prisma.Decimal(input.quantity),
+      quantity:
+        input.quantity === null || input.quantity === undefined
+          ? null
+          : new Prisma.Decimal(input.quantity),
       unit: input.unit ?? null,
       displayName,
       note: input.note ?? null,
