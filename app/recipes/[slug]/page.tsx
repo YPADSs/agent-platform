@@ -28,7 +28,9 @@ function parseServings(value?: string): number | undefined {
   return parsed;
 }
 
-export async function generateMetadata({ params }: RecipeMetadataProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: RecipeMetadataProps): Promise<Metadata> {
   const recipe = await getRecipeDetail(params.slug);
 
   if (!recipe) {
@@ -47,7 +49,12 @@ export async function generateMetadata({ params }: RecipeMetadataProps): Promise
       canonical,
       languages: getContentDetailAlternates('recipes', recipe.slug),
     },
-    openGraph: {},
+    openGraph: {
+      title: recipe.title,
+      description: recipe.description,
+      url: canonical,
+      type: 'article',
+    },
   };
 }
 
@@ -73,7 +80,7 @@ export default async function RecipeDetailPage({
       <ViewTracker kind="recipe" slug={recipe.slug} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTMLõ{{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <article className="recipeDetail">
         <header className="recipeHero">
@@ -143,10 +150,12 @@ export default async function RecipeDetailPage({
             </ul>
           </section>
 
-          <RecipeSubstitutions ingredients={recipe.ingredients.map((ingredient) => ({
-            name: ingredient.name,
-            text: ingredient.text,
-          }))} />
+          <RecipeSubstitutions
+            ingredients={recipe.ingredients.map((ingredient) => ({
+              name: ingredient.name,
+              text: ingredient.text,
+            }))}
+          />
 
           <section className="panel">
             <h2>Method</h2>
