@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { defaultLocale, locales, type Locale } from '@/i18n';
 
 export function getSiteBaseUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  return process.env.NEXT_PUBLIC_SITE_URL || 'https://nourivo.netlify.app';
 }
 
 export function getAbsoluteUrl(path: string) {

@@ -8,6 +8,9 @@ export type AnalyticsEventName =
   | 'planner_recipe_search'
   | 'planner_item_added'
   | 'planner_item_removed'
+  | 'planner_autoplan_generated'
+  | 'planner_autoplan_applied'
+  | 'pantry_imported'
   | 'paywall_viewed';
 
 export type AnalyticsEvent = {

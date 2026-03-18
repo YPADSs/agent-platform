@@ -7,9 +7,9 @@ import { withLocale } from '@/lib/locale-path';
 
 const LOCALE_OPTIONS = [
   { value: 'en', label: 'English' },
-  { value: 'fr', label: 'Français' },
+  { value: 'fr', label: 'Francais' },
   { value: 'de', label: 'Deutsch' },
-  { value: 'es', label: 'Español' },
+  { value: 'es', label: 'Espanol' },
   { value: 'it', label: 'Italiano' },
 ] as const;
 
@@ -104,14 +104,11 @@ export default function OnboardingPreferencesFlow() {
 
   const plannerStatusText = useMemo(() => {
     if (entitlements.canUsePlanner) {
-      return 'Planner is ready on this account once your core setup is confirmed.';
+      return 'Planner is available once your core setup is confirmed.';
     }
 
-    return 'Planner remains Premium-gated, but units and language will carry forward to your account experience.';
+    return 'Planner stays Premium-gated, but your language and unit choices will still carry across the product.';
   }, [entitlements.canUsePlanner]);
-
-  const isCompleted = preferences.onboardingStatus === 'completed';
-  const activeLocale = visitingLocale ?? preferences.locale;
 
   async function savePreferences(onboardingStatus: 'in_progress' | 'completed') {
     setError(null);
@@ -140,8 +137,8 @@ export default function OnboardingPreferencesFlow() {
       setPreferences(data.preferences ?? preferences);
       setStatusMessage(
         onboardingStatus === 'completed'
-          ? 'Your Sprint 4 core setup is completed.'
-          : 'Onboarding progress saved.',
+          ? 'Your core setup is complete.'
+          : 'Progress saved.',
       );
     } catch {
       setError('Network error. Please try again.');
@@ -152,13 +149,13 @@ export default function OnboardingPreferencesFlow() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    void savePreferences('completed');
+    await savePreferences('completed');
   }
 
   if (loading) {
     return (
       <section className="panel">
-        <p>Loading Sprint 4 onboarding ...</p>
+        <p>Loading onboarding...</p>
       </section>
     );
   }
@@ -166,28 +163,19 @@ export default function OnboardingPreferencesFlow() {
   return (
     <div className="recipeColumns">
       <section className="panel">
-        <h2>Complete your core setup</h2>
-        <p>Confirm your goal, language, and units so Sprint 4 experiences can pull from a single source of truth.</p>
+        <h2>Core setup</h2>
+        <p>
+          Set a planning goal, choose language and units, and create the baseline that the
+          rest of Nourivo will use.
+        </p>
         <p className="muted">{plannerStatusText}</p>
-        <div className="emptyState">
-          <p>
-            Sprint 4 V1 currently persists <strong>goal</strong>, <strong>language</strong>, and
-            <strong>units</strong> as the core onboarding baseline.
-          </p>
-          <p className="muted">
-            Diet/preference/allergy details can be extended later only when explicitly scoped.
-          </p>
-        </div>
       </section>
 
       <section className="panel">
         <form className="preferencesForm" onSubmit={handleSubmit}>
-          <div className="field">
-            <label htmlFor="goalCode">Goal</label>
+          <label className="field fieldWide">
+            <span>Goal</span>
             <input
-              id="goalCode"
-              name="goalCode"
-              type="text"
               value={preferences.goalCode ?? ''}
               onChange={(event) =>
                 setPreferences((prev) => ({
@@ -197,14 +185,11 @@ export default function OnboardingPreferencesFlow() {
               }
               placeholder="balanced_eating"
             />
-            <p className="muted">Use a simple internal code like `balanced_eating` or `strength_focus`.</p>
-          </div>
+          </label>
 
-          <div className="field">
-            <label htmlFor="locale">Language</label>
+          <label className="field">
+            <span>Language</span>
             <select
-              id="locale"
-              name="locale"
               value={preferences.locale}
               onChange={(event) =>
                 setPreferences((prev) => ({
@@ -219,13 +204,11 @@ export default function OnboardingPreferencesFlow() {
                 </option>
               ))}
             </select>
-          </div>
+          </label>
 
-          <div className="field">
-            <label htmlFor="unitSystem">Units</label>
+          <label className="field">
+            <span>Units</span>
             <select
-              id="unitSystem"
-              name="unitSystem"
               value={preferences.unitSystem}
               onChange={(event) =>
                 setPreferences((prev) => ({
@@ -240,28 +223,16 @@ export default function OnboardingPreferencesFlow() {
                 </option>
               ))}
             </select>
-          </div>
+          </label>
 
-          <div className="filterActions">
-            <button
-              type="button"
-              disabled={saving}
-              onClick={() => {
-                void savePreferences('in_progress');
-              }}
-            >
-              {saving ? 'Saving ...' : 'Save progress'}
+          <div className="filterActions fieldWide">
+            <button type="button" disabled={saving} onClick={() => void savePreferences('in_progress')}>
+              {saving ? 'Saving...' : 'Save progress'}
             </button>
             <button type="submit" disabled={saving}>
-              {saving ? 'Saving ...' : 'Complete setup'}
+              {saving ? 'Saving...' : 'Complete setup'}
             </button>
           </div>
-
-          {preferences.onboardingCompletedAt ? (
-            <p className="muted">
-              Completed on {new Date(preferences.onboardingCompletedAt).toLocaleDateString()}
-            </p>
-          ) : null}
         </form>
 
         {statusMessage ? <p className="statusMessage">{statusMessage}</p> : null}
@@ -269,25 +240,18 @@ export default function OnboardingPreferencesFlow() {
       </section>
 
       <section className="panel">
-        <h2>Next steps</h2>
+        <h2>What happens next</h2>
         <ul className="ingredientList">
-          <li>
-            <strong>Account</strong>
-            <span className="muted">Manage the same preferences from your account page.</span>
-          </li>
-          <li>
-            <strong>Planner</strong>
-            <span className="muted">Premium-gated access stays server-side, but these units will carry forward.</span>
-          </li>
-          <li>
-            <strong>Shopping list</strong>
-            <span className="muted">Aggregated items can now readyour unit preference on the server.</span>
-          </li>
+          <li>Planner and shopping flows reuse your preferred unit system.</li>
+          <li>Language selection stays attached to your account profile.</li>
+          <li>Your account page becomes the place to manage Premium and preferences.</li>
         </ul>
         <div className="filterActions">
-          <Link href={withLocale(activeLocale, '/account')}>Go to Account</Link>
-          <Link href={withLocale(activeLocale, '/planner')}>
-            {isCompleted ? 'Go to Planner' : 'View Planner status'}
+          <Link href={withLocale(visitingLocale, '/account')} className="buttonSecondary">
+            Go to account
+          </Link>
+          <Link href={withLocale(visitingLocale, '/planner')} className="buttonGhost">
+            Review planner
           </Link>
         </div>
       </section>

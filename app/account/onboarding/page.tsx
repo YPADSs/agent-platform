@@ -16,12 +16,17 @@ export default async function AccountOnboardingPage({ params }: AccountOnboardin
     return (
       <div className="recipesPage">
         <div className="pageIntro">
-          <h1>Complete your setup</h1>
-          <p>Sign in to confirm your core Sprint 4 preferences.</p>
+          <p className="eyebrow">Onboarding</p>
+          <h1>Set up your Nourivo profile.</h1>
+          <p>Sign in first so your language, units, and planning defaults can be saved.</p>
         </div>
         <div className="filterActions">
-          <Link href={withLocale(locale, '/account/login')}>Log in</Link>
-          <Link href={withLocale(locale, '/account/register')}>Create an account</Link>
+          <Link href={withLocale(locale, '/account/login')} className="buttonPrimary">
+            Log in
+          </Link>
+          <Link href={withLocale(locale, '/account/register')} className="buttonSecondary">
+            Create account
+          </Link>
         </div>
       </div>
     );
@@ -30,10 +35,13 @@ export default async function AccountOnboardingPage({ params }: AccountOnboardin
   return (
     <div className="recipesPage">
       <div className="pageIntro">
-        <h1>Complete your Sprint 4 setup</h1>
-        <p>Confirm your language, units, and goal baseline so your account and planner experiences share one source of truth.</p>
+        <p className="eyebrow">Onboarding</p>
+        <h1>Confirm the settings that power your weekly routine.</h1>
+        <p>
+          This setup keeps language, units, and planning goals aligned across account,
+          planner, pantry, and shopping flows.
+        </p>
       </div>
-
       <OnboardingPreferencesFlow />
     </div>
   );

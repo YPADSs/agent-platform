@@ -13,6 +13,7 @@ type PantryItem = {
   quantity: number | null;
   unit: string | null;
   note: string | null;
+  lastConfirmedAt: string | null;
   updatedAt: string;
 };
 
@@ -22,11 +23,13 @@ export default function PantryPage() {
   const [items, setItems] = useState<PantryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   async function load() {
     setErr(null);
@@ -37,7 +40,11 @@ export default function PantryPage() {
 
     if (!res.ok) {
       setItems([]);
-      setErr(data.error === 'UNAUTHENTICATED' ? 'Please log in to manage your pantry.' : 'Unable to load pantry right now.');
+      setErr(
+        data.error === 'UNAUTHENTICATED'
+          ? 'Please log in to manage your pantry.'
+          : 'Unable to load pantry right now.',
+      );
       setLoading(false);
       return;
     }
@@ -54,6 +61,7 @@ export default function PantryPage() {
     event.preventDefault();
     setSaving(true);
     setErr(null);
+    setStatus(null);
 
     const res = await fetch('/api/v1/me/pantry', {
       method: 'POST',
@@ -69,7 +77,11 @@ export default function PantryPage() {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      setErr(data.error === 'DUPLICATE_PANTRY_ITEM' ? 'This ingredient is already in your pantry.' : data.error ?? 'Unable to add pantry item.');
+      setErr(
+        data.error === 'DUPLICATE_PANTRY_ITEM'
+          ? 'This ingredient is already in your pantry.'
+          : data.error ?? 'Unable to add pantry item.',
+      );
       setSaving(false);
       return;
     }
@@ -79,6 +91,26 @@ export default function PantryPage() {
     setUnit('');
     setNote('');
     setSaving(false);
+    setStatus('Pantry item added.');
+    await load();
+  }
+
+  async function syncCheckedItems() {
+    setSyncing(true);
+    setErr(null);
+    setStatus(null);
+
+    const res = await fetch('/api/v1/me/pantry/import', { method: 'POST' });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      setErr(data.error ?? 'Unable to import checked shopping items.');
+      setSyncing(false);
+      return;
+    }
+
+    setStatus(`${data.importedCount ?? 0} item(s) imported and ${data.skippedCount ?? 0} skipped.`);
+    setSyncing(false);
     await load();
   }
 
@@ -88,19 +120,25 @@ export default function PantryPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ lastConfirmedAt: new Date().toISOString() }),
     });
+    setStatus(`Updated ${item.displayName}.`);
     await load();
   }
 
   async function removeItem(item: PantryItem) {
     await fetch(`/api/v1/me/pantry/${item.id}`, { method: 'DELETE' });
+    setStatus(`${item.displayName} removed.`);
     await load();
   }
 
   return (
     <div className="recipesPage">
       <div className="pageIntro">
-        <h1>Pantry</h1>
-        <p>Track the ingredients you already have at home so later V2 flows can reuse a normalized source of truth.</p>
+        <p className="eyebrow">Pantry</p>
+        <h1>Keep a simple source of truth for what is already at home.</h1>
+        <p>
+          Pantry is the bridge between bought items and future planning decisions. Track key
+          staples manually or sync them from your checked shopping list.
+        </p>
       </div>
 
       {err ? (
@@ -108,13 +146,31 @@ export default function PantryPage() {
           <p>{err}</p>
           {err.includes('log in') ? (
             <div className="filterActions">
-              <Link href={withLocale(locale, '/account/login')}>Log in</Link>
-              <Link href={withLocale(locale, '/account/register')}>Create an account</Link>
+              <Link href={withLocale(locale, '/account/login')} className="buttonPrimary">
+                Log in
+              </Link>
+              <Link href={withLocale(locale, '/account/register')} className="buttonSecondary">
+                Create account
+              </Link>
             </div>
           ) : null}
         </div>
       ) : (
         <>
+          <section className="panel">
+            <div className="plannerSidebarHeader">
+              <div>
+                <h2>Pantry sync</h2>
+                <p className="muted">
+                  Move checked shopping items into pantry so later planning flows can reuse them.
+                </p>
+              </div>
+              <button type="button" onClick={syncCheckedItems} disabled={syncing}>
+                {syncing ? 'Syncing...' : 'Sync checked shopping items'}
+              </button>
+            </div>
+          </section>
+
           <form className="recipesFilters" onSubmit={addItem}>
             <label className="field">
               <span>Ingredient</span>
@@ -132,12 +188,15 @@ export default function PantryPage() {
               <span>Note</span>
               <input value={note} onChange={(event) => setNote(event.target.value)} placeholder="Low stock left" />
             </label>
-            <div className="filterActions">
+            <div className="filterActions fieldWide">
               <button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Add to pantry'}</button>
             </div>
           </form>
 
-          <p className="resultsMeta">{loading ? 'Loading pantry...' : `${items.length} item${items.length === 1 ? '' : 's'}`}</p>
+          {status ? <p className="statusMessage">{status}</p> : null}
+          <p className="resultsMeta">
+            {loading ? 'Loading pantry...' : `${items.length} item${items.length === 1 ? '' : 's'}`}
+          </p>
 
           {items.length ? (
             <ul className="recipeGrid">
@@ -148,10 +207,15 @@ export default function PantryPage() {
                     <p className="muted">Updated {new Date(item.updatedAt).toLocaleDateString()}</p>
                   </div>
                   <h2>{item.displayName}</h2>
-                  <p>{item.quantity !== null ? `${item.quantity} ${item.unit ?? ''}`.trim() : 'No quantity yet.'}</p>
+                  <p>{item.quantity !== null ? `${item.quantity} ${item.unit ?? ''}`.trim() : 'No quantity recorded yet.'}</p>
+                  {item.lastConfirmedAt ? (
+                    <p className="muted">
+                      Last confirmed {new Date(item.lastConfirmedAt).toLocaleDateString()}
+                    </p>
+                  ) : null}
                   {item.note ? <p className="muted">{item.note}</p> : null}
                   <div className="filterActions">
-                    <button type="button" onClick={() => markSeenToday(item)}>Mark as seen today</button>
+                    <button type="button" onClick={() => markSeenToday(item)}>Mark seen today</button>
                     <button type="button" onClick={() => removeItem(item)}>Remove</button>
                   </div>
                 </li>
@@ -160,7 +224,7 @@ export default function PantryPage() {
           ) : (
             <div className="emptyState">
               <h2>Your pantry is empty</h2>
-              <p>Add a few key ingredients you already have at home to start the V2 foundation.</p>
+              <p>Start with a few staples you often keep at home or sync checked shopping items.</p>
             </div>
           )}
         </>

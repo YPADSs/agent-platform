@@ -24,6 +24,12 @@ export type PantryItemSummary = {
   updatedAt: string;
 };
 
+export type PantryImportResult = {
+  importedCount: number;
+  skippedCount: number;
+  items: PantryItemSummary[];
+};
+
 const pantryItemSelect = {
   id: true,
   ingredientId: true,
@@ -71,7 +77,7 @@ function normalizeText(value: string) {
 export function toIngredientKey(value: string) {
   return normalizeText(value)
     .toLowerCase()
-    .replace(/^[a-z0-9]+/g, '-')
+    .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
 
@@ -89,6 +95,16 @@ async function getUserIdByEmail(email: string) {
   }
 
   return user.id;
+}
+
+async function ensureIngredientByKey(key: string, defaultName: string) {
+  const prisma = getPrisma();
+  return prisma.ingredientCatalog.upsert({
+    where: { key },
+    update: { defaultName },
+    create: { key, defaultName },
+    select: { id: true },
+  });
 }
 
 export async function getPantryByEmail(email: string) {
@@ -118,16 +134,7 @@ export async function createPantryItemByEmail(
     throw error;
   }
 
-  const ingredient = await prisma.ingredientCatalog.upsert({
-    where: { key },
-    update: {},
-    create: {
-      key,
-      defaultName: displayName,
-    },
-    select: { id: true },
-  });
-
+  const ingredient = await ensureIngredientByKey(key, displayName);
   const existing = await prisma.pantryItem.findUnique({
     where: {
       userId_ingredientId: {
@@ -161,6 +168,69 @@ export async function createPantryItemByEmail(
   });
 
   return toSummary(item);
+}
+
+export async function importCheckedShoppingListItemsToPantryByEmail(
+  email: string,
+): Promise<PantryImportResult> {
+  const prisma = getPrisma();
+  const userId = await getUserIdByEmail(email);
+  const checkedItems = await prisma.shoppingListItem.findMany({
+    where: { userId, checked: true },
+    orderBy: { updatedAt: 'desc' },
+    select: { id: true, text: true },
+  });
+
+  const imported: PantryItemSummary[] = [];
+  const seenKeys = new Set<string>();
+  let skippedCount = 0;
+
+  for (const shoppingItem of checkedItems) {
+    const displayName = normalizeText(shoppingItem.text);
+    const key = toIngredientKey(displayName);
+
+    if (!displayName || !key || seenKeys.has(key)) {
+      skippedCount += 1;
+      continue;
+    }
+
+    seenKeys.add(key);
+    const ingredient = await ensureIngredientByKey(key, displayName);
+    const existing = await prisma.pantryItem.findUnique({
+      where: {
+        userId_ingredientId: {
+          userId,
+          ingredientId: ingredient.id,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existing) {
+      skippedCount += 1;
+      continue;
+    }
+
+    const item = await prisma.pantryItem.create({
+      data: {
+        userId,
+        ingredientId: ingredient.id,
+        source: PantryItemSource.SHOPPING_LIST,
+        sourceRefId: shoppingItem.id,
+        displayName,
+        lastConfirmedAt: new Date(),
+      },
+      select: pantryItemSelect,
+    });
+
+    imported.push(toSummary(item));
+  }
+
+  return {
+    importedCount: imported.length,
+    skippedCount,
+    items: imported,
+  };
 }
 
 export async function updatePantryItemByEmail(email: string, itemId: string, input: PatchPantryInput) {

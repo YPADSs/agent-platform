@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import {useEffect, useState, type FormEvent} from 'react';
-import {withLocale} from '@/lib/locale-path';
+import { useEffect, useState, type FormEvent } from 'react';
+import { withLocale } from '@/lib/locale-path';
 
 type ManualItem = {
   id: string;
@@ -24,7 +24,7 @@ type PlannerShoppingList = {
 };
 
 type ShoppingListPageProps = {
-  params?: {locale?: string};
+  params?: { locale?: string };
 };
 
 function startOfWeek(date: Date) {
@@ -49,13 +49,14 @@ function formatDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-export default function ShoppingListPage({params}: ShoppingListPageProps) {
+export default function ShoppingListPage({ params }: ShoppingListPageProps) {
   const locale = params?.locale;
   const [items, setItems] = useState<ManualItem[]>([]);
   const [text, setText] = useState('');
   const [err, setErr] = useState<string | null>(null);
-  const [linkReady, setLinkReady] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
 
   const [weekStart, setWeekStart] = useState(formatDate(startOfWeek(new Date())));
   const [plannerList, setPlannerList] = useState<PlannerShoppingList | null>(null);
@@ -88,10 +89,9 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
     setPlannerAuthenticated(true);
 
     try {
-      const res = await fetch(
-        `/api/v1/planner/weeks/${targetWeekStart}/shopping-list`,
-        {cache: 'no-store'}
-      );
+      const res = await fetch(`/api/v1/planner/weeks/${targetWeekStart}/shopping-list`, {
+        cache: 'no-store',
+      });
 
       const data = await res.json().catch(() => ({}));
 
@@ -104,9 +104,7 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
 
       if (res.status === 403) {
         setPlannerPremiumRequired(true);
-        setPlannerError(
-          'Upgrade to Premium to unlock planner-based shopping aggregation.'
-        );
+        setPlannerError('Upgrade to Premium to unlock planner-based shopping aggregation.');
         return;
       }
 
@@ -116,21 +114,16 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
         return;
       }
 
-      setPlannerError(
-        'Unable to load planner shopping aggregation for this week.'
-      );
+      setPlannerError('Unable to load planner shopping aggregation for this week.');
     } catch {
       setPlannerList(null);
-      setPlannerError(
-        'Network error while loading planner shopping aggregation.'
-      );
+      setPlannerError('Network error while loading planner shopping aggregation.');
     } finally {
       setPlannerLoading(false);
     }
   }
 
   useEffect(() => {
-    setLinkReady(true);
     void load();
   }, []);
 
@@ -142,56 +135,75 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
     event.preventDefault();
     const res = await fetch('/api/shopping-list', {
       method: 'POST',
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify({text}),
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text }),
     });
 
     if (!res.ok) {
-      setErr('Failed to add item (are you logged in?).');
+      setErr('Failed to add item.');
       return;
     }
 
     setText('');
+    setStatus('Shopping item added.');
     await load();
   }
 
   async function toggle(item: ManualItem) {
     await fetch('/api/shopping-list', {
       method: 'PATCH',
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify({id: item.id, pantry: !item.pantry}),
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id: item.id, pantry: !item.pantry }),
     });
 
+    setStatus(`${item.text} updated.`);
     await load();
   }
 
   async function remove(item: ManualItem) {
     await fetch('/api/shopping-list', {
       method: 'DELETE',
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify({id: item.id}),
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id: item.id }),
     });
 
+    setStatus(`${item.text} removed.`);
     await load();
   }
 
-  function movePlannerWeek(days: number) {
-    setWeekStart((current) =>
-      formatDate(startOfWeek(addDays(new Date(current), days)))
-    );
+  async function syncCheckedToPantry() {
+    setImporting(true);
+    setStatus(null);
+    setErr(null);
+
+    const res = await fetch('/api/v1/me/pantry/import', { method: 'POST' });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      setErr(data.error ?? 'Unable to import checked items into pantry.');
+      setImporting(false);
+      return;
+    }
+
+    setStatus(`${data.importedCount ?? 0} item(s) imported into pantry and ${data.skippedCount ?? 0} skipped.`);
+    setImporting(false);
   }
 
-  const pantryCount = items.filter((item) => item.pantry).length;
+  function movePlannerWeek(days: number) {
+    setWeekStart((current) => formatDate(startOfWeek(addDays(new Date(current), days))));
+  }
+
+  const checkedCount = items.filter((item) => item.pantry).length;
   const plannerItemCount = plannerList?.items?.length ?? 0;
 
   return (
     <div className="recipesPage">
       <div className="pageIntro">
-        <h1>Shopping list</h1>
+        <p className="eyebrow">Shopping list</p>
+        <h1>Keep shopping practical and connected to planning.</h1>
         <p>
-          Add ingredients manually or review the planner-linked weekly aggregation.
-          Unit continuity stays aligned with your current preferences where planner
-          aggregation is available.
+          Add manual items, review planner-based weekly aggregation, and sync checked items
+          into pantry so your product data stays coherent.
         </p>
       </div>
 
@@ -205,10 +217,7 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
             <button type="button" onClick={() => movePlannerWeek(-7)}>
               Previous week
             </button>
-            <button
-              type="button"
-              onClick={() => setWeekStart(formatDate(startOfWeek(new Date())))}
-            >
+            <button type="button" onClick={() => setWeekStart(formatDate(startOfWeek(new Date())))}>
               This week
             </button>
             <button type="button" onClick={() => movePlannerWeek(7)}>
@@ -223,8 +232,8 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
         {plannerList ? (
           <>
             <p className="resultsMeta">
-              {plannerItemCount} aggregated item{plannerItemCount === 1 ? '' : 's'} -
-              unit system: {plannerList.unitSystem || 'metric'}
+              {plannerItemCount} aggregated item{plannerItemCount === 1 ? '' : 's'} • unit system:{' '}
+              {plannerList.unitSystem || 'metric'}
             </p>
             {plannerList.items.length ? (
               <ul className="ingredientList">
@@ -232,7 +241,7 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
                   <li key={item.ingredientKey}>
                     <strong>{item.displayName}</strong>
                     <span className="muted">
-                      {item.quantity} {item.unit} - {item.sourceCount} recipe
+                      {item.quantity} {item.unit} • {item.sourceCount} recipe
                       {item.sourceCount === 1 ? '' : 's'}
                     </span>
                   </li>
@@ -240,12 +249,11 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
               </ul>
             ) : (
               <div className="emptyState">
-                <p>
-                  No planner meals for this week yet. Add meals in the planner to see
-                  aggregated ingredients.
-                </p>
+                <p>No planner meals for this week yet. Add meals in the planner to see aggregated ingredients.</p>
                 <div className="filterActions">
-                  <Link href={withLocale(locale, '/planner')}>Open planner</Link>
+                  <Link href={withLocale(locale, '/planner')} className="buttonPrimary">
+                    Open planner
+                  </Link>
                 </div>
               </div>
             )}
@@ -254,15 +262,21 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
 
         {!plannerLoading && plannerPremiumRequired ? (
           <div className="filterActions">
-            <Link href={withLocale(locale, '/account')}>Upgrade to Premium</Link>
-            <Link href={withLocale(locale, '/planner')}>Review planner</Link>
+            <Link href={withLocale(locale, '/account')} className="buttonPrimary">
+              Upgrade to Premium
+            </Link>
+            <Link href={withLocale(locale, '/planner')} className="buttonSecondary">
+              Review planner
+            </Link>
           </div>
         ) : null}
 
         {!plannerLoading && !plannerAuthenticated ? (
           <div className="filterActions">
-            <Link href={withLocale(locale, '/account/login')}>Log in</Link>
-            <Link href={withLocale(locale, '/account/register')}>
+            <Link href={withLocale(locale, '/account/login')} className="buttonPrimary">
+              Log in
+            </Link>
+            <Link href={withLocale(locale, '/account/register')} className="buttonSecondary">
               Create an account
             </Link>
           </div>
@@ -272,15 +286,14 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
       {err ? (
         <div className="emptyState">
           <p>{err}</p>
-          {linkReady ? (
-            <p>
-              <Link href={withLocale(locale, '/account/login')}>Log in</Link> or{' '}
-              <Link href={withLocale(locale, '/account/register')}>
-                create an account
-              </Link>{' '}
-              to save your shopping list.
-            </p>
-          ) : null}
+          <div className="filterActions">
+            <Link href={withLocale(locale, '/account/login')} className="buttonPrimary">
+              Log in
+            </Link>
+            <Link href={withLocale(locale, '/account/register')} className="buttonSecondary">
+              Create an account
+            </Link>
+          </div>
         </div>
       ) : (
         <>
@@ -293,15 +306,21 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
                 placeholder="Avocado"
               />
             </label>
-            <div className="filterActions">
+            <div className="filterActions fieldWide">
               <button type="submit">Add item</button>
+              {checkedCount ? (
+                <button type="button" onClick={syncCheckedToPantry} disabled={importing}>
+                  {importing ? 'Syncing to pantry...' : 'Sync checked items to pantry'}
+                </button>
+              ) : null}
             </div>
           </form>
 
+          {status ? <p className="statusMessage">{status}</p> : null}
           <p className="resultsMeta">
             {loading
               ? 'Loading shopping list...'
-              : `${items.length} item${items.length === 1 ? '' : 's'} - ${pantryCount} at home`}
+              : `${items.length} item${items.length === 1 ? '' : 's'} • ${checkedCount} checked`}
           </p>
 
           {items.length ? (
@@ -309,18 +328,14 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
               {items.map((item) => (
                 <li key={item.id} className="recipeCard">
                   <div className="recipeCardHeader">
-                    <p className="badge">
-                      {item.pantry ? 'In pantry' : 'Need to buy'}
-                    </p>
+                    <p className="badge">{item.pantry ? 'Checked' : 'To buy'}</p>
                   </div>
                   <p>{item.text}</p>
                   <div className="filterActions">
                     <button type="button" onClick={() => toggle(item)}>
-                      {item.pantry ? 'Mark as need to buy' : 'Mark as at home'}
+                      {item.pantry ? 'Mark as to buy' : 'Mark as checked'}
                     </button>
-                    <button type="button" onClick={() => remove(item)}>
-                      Remove
-                    </button>
+                    <button type="button" onClick={() => remove(item)}>Remove</button>
                   </div>
                 </li>
               ))}
@@ -328,10 +343,7 @@ export default function ShoppingListPage({params}: ShoppingListPageProps) {
           ) : (
             <div className="emptyState">
               <h2>Your shopping list is empty</h2>
-              <p>
-                Add items manually or use &lquot;Add ingredients to shopping list&rquot; from a
-                recipe.
-              </p>
+              <p>Add a few items manually or start from the planner-generated weekly shopping view.</p>
             </div>
           )}
         </>
