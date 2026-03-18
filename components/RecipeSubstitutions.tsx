@@ -33,7 +33,9 @@ function toIngredientKey(value: string) {
     .replace(/^-+|-+$/g, '');
 }
 
-export default function RecipeSubstitutions({ ingredients }: RecipeSubstitutionsProps) {
+export default function RecipeSubstitutions({
+  ingredients,
+}: RecipeSubstitutionsProps) {
   const normalizedItems = useMemo(() => {
     const map = new Map<string, string>();
 
@@ -74,11 +76,9 @@ export default function RecipeSubstitutions({ ingredients }: RecipeSubstitutions
       try {
         const fetched = await Promise.all(
           normalizedItems.map(async (item) => {
-            const response = await fetch(`
-/api/v1/substitutions?ingredientKey=${encodeURIComponent(item.ingredientKey)}`,
-              {
-                cache: 'no-store',
-              },
+            const response = await fetch(
+              `/api/v1/substitutions?ingredientKey=${encodeURIComponent(item.ingredientKey)}`,
+              { cache: 'no-store' },
             );
 
             const data = await response.json().catch(() => ({}));
@@ -155,11 +155,16 @@ export default function RecipeSubstitutions({ ingredients }: RecipeSubstitutions
             <h3>{result.ingredientName}</h3>
             <ul className="ingredientList">
               {result.suggestions.map((suggestion) => (
-                <li key={`${result.ingredientKey}-${suggestion.ingredientKey}`-${suggestion.matchType}`}>
+                <li
+                  key={`${result.ingredientKey}-${suggestion.ingredientKey}-${suggestion.matchType}`}
+                >
                   <strong>{suggestion.displayName}</strong>
-                  <p >{suggestion.reason}</p>
+                  <p>{suggestion.reason}</p>
                   <small className="muted">
-                    Match: {suggestion.matchType === 'ingredient' ? 'direct ingredient' : 'category fallback'}
+                    Match:{' '}
+                    {suggestion.matchType === 'ingredient'
+                      ? 'direct ingredient'
+                      : 'category fallback'}
                   </small>
                   {suggestion.note ? <p className="muted">{suggestion.note}</p> : null}
                 </li>
