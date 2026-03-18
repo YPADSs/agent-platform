@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ViewTracker from '@/components/ViewTracker';
 import RecipeActions from '@/components/RecipeActions';
+import RecipeSubstitutions from '@/components/RecipeSubstitutions';
 import { getRecipeDetail } from '@/lib/recipes';
 import {
   getAbsoluteUrl,
@@ -27,7 +28,9 @@ function parseServings(value?: string): number | undefined {
   return parsed;
 }
 
-export async function generateMetadata({ params }: RecipeMetadataProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: RecipeMetadataProps): Promise<Metadata> {
   const recipe = await getRecipeDetail(params.slug);
 
   if (!recipe) {
@@ -146,6 +149,13 @@ export default async function RecipeDetailPage({
               ))}
             </ul>
           </section>
+
+          <RecipeSubstitutions
+            ingredients={recipe.ingredients.map((ingredient) => ({
+              name: ingredient.name,
+              text: ingredient.text,
+            }))}
+          />
 
           <section className="panel">
             <h2>Method</h2>
