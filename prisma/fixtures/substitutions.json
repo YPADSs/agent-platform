@@ -1,0 +1,35 @@
+[
+  {
+    "sourceKey": "chickpeas",
+    "sourceName": "Chickpeas",
+    "sourceCategoryKey": "legumes",
+    "substituteKey": "white-beans",
+    "substituteName": "White beans",
+    "substituteCategoryKey": "legumes",
+    "reason": "Similar protein and fiber use in salads and bowls.",
+    "note": "Texture may be softer after cooking.",
+    "sortOrder": 1
+  },
+  {
+    "sourceKey": "greek-yogurt",
+    "sourceName": "Greek yogurt",
+    "sourceCategoryKey": "dairy-cultured",
+    "substituteKey": "plain-yogurt",
+    "substituteName": "Plain yogurt",
+    "substituteCategoryKey": "dairy-cultured",
+    "reason": "Works in breakfast bowls and dressings with a slightly lighter texture.",
+    "note": "May be less thick than Greek yogurt.",
+    "sortOrder": 1
+  },
+  {
+    "sourceKey": null,
+    "sourceName": null,
+    "sourceCategoryKey": "leafy-greens",
+    "substituteKey": "spinach",
+    "substituteName": "Spinach",
+    "substituteCategoryKey": "leafy-greens",
+    "reason": "Flexible leafy green base for salads and saut\u00e9s.",
+    "note": "Use fresh or wilted depending on the recipe.",
+    "sortOrder": 1
+  }
+]
