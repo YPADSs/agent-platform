@@ -1,21 +1,23 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import SiteFrame from '@/components/SiteFrame';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://nourivo.netlify.app'),
   title: {
-    default: 'Healthy Food Platform',
-    template: '%s ~ Healthy Food Platform',
+    default: 'Nourivo',
+    template: '%s | Nourivo',
   },
-  description: 'Healthy recipes, articles, favorites, shopping list, and Premium access.',
+  description:
+    'Nourivo helps people plan balanced meals, manage pantry staples, save smart recipes, and turn healthy intentions into weekly routines.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SiteFrame>{children}</SiteFrame>
+      </body>
     </html>
   );
 }

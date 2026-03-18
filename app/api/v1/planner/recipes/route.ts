@@ -1,6 +1,6 @@
-
 import { NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/prisma';
+import { ensureRecipeRecordInDatabase, listRecipeSummaries } from '@/lib/recipes';
 import { requireSession } from '@/lib/session';
 import { requirePlannerAccess, type SupportedMealSlot } from '@/lib/planner';
 
@@ -49,38 +49,28 @@ export async function GET(req: Request) {
     const user = await getAuthenticatedUser();
     await requirePlannerAccess(user.id);
 
-    const prisma = getPrisma();
-    const rows = await prisma.recipe.findMany({
-      where: {
-        ...(q 
-          ? {
-              OR: [
-                { title: { contains: q, mode: 'insensitive' } },
-                { slug: { contains: q, mode: 'insensitive' } },
-                { body: { contains: q, mode: 'insensitive' } },
-              ],
-            }
-          : {}),
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 12,
-      select: { id: true, slug: true, title: true, body: true },
-    });
-
     const hints = slotToMealType[slot];
+    const summaries = await listRecipeSummaries({ q, limit: 24 });
+    const filtered = summaries.filter((recipe) => hints.includes(recipe.mealType)).slice(0, 12);
 
-    const recipes = rows
-      .filter((row) => {
-        const haystack = `${row.title} ${row.slug} ${row.body}`.toLowerCase();
-        return hints.some((hint) => haystack.includes(hint));
-      })
-      .map((row) => ({
-        id: row.id,
-        slug: row.slug,
-        title: row.title,
-      }));
+    const hydrated = await Promise.all(
+      filtered.map(async (recipe) => {
+        const record = await ensureRecipeRecordInDatabase(recipe.slug);
+        if (!record) {
+          return null;
+        }
 
-    return NextResponse.json({ recipes });
+        return {
+          id: record.id,
+          slug: recipe.slug,
+          title: recipe.title,
+          mealType: recipe.mealType,
+          description: recipe.description,
+        };
+      }),
+    );
+
+    return NextResponse.json({ recipes: hydrated.filter(Boolean) });
   } catch (error) {
     const status = (error as { status?: number })?.status ?? 401;
     const code =

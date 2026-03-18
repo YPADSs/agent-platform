@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import AccountPreferencesPanel from '@/components/AccountPreferencesPanel';
-import TrackedSubmitButton from '@/components/TrackedSubmitButton';
+import BillingRedirectButton from '@/components/BillingRedirectButton';
 import { getAccountStatusByEmail } from '@/lib/billing';
 import { withLocale } from '@/lib/locale-path';
 import { getUserPreferencesByEmail } from '@/lib/preferences';
@@ -14,12 +14,17 @@ function renderLoggedOut(locale?: string) {
   return (
     <div className="recipesPage">
       <div className="pageIntro">
-        <h1>Account</h1>
-        <p>Please log in to view your account.</p>
+        <p className="eyebrow">Account</p>
+        <h1>Welcome back when you are ready.</h1>
+        <p>Sign in to manage preferences, Premium access, planner features, and saved content.</p>
       </div>
       <div className="filterActions">
-        <Link href={withLocale(locale, '/account/login')}>Log in</Link>
-        <Link href={withLocale(locale, '/account/register')}>Create an account</Link>
+        <Link href={withLocale(locale, '/account/login')} className="buttonPrimary">
+          Log in
+        </Link>
+        <Link href={withLocale(locale, '/account/register')} className="buttonSecondary">
+          Create account
+        </Link>
       </div>
     </div>
   );
@@ -42,112 +47,153 @@ export default async function AccountPage({ params }: AccountPageProps) {
     ]);
 
     if (!account) {
-      return (
-        <div className="recipesPage">
-          <h1>Account</h1>
-          <p>User not found.</p>
-        </div>
-      );
+      return renderLoggedOut(locale);
     }
 
-    const premiumLabel = account.subscription.isPremium ? 'Active' : 'Not active';
-    const showCheckout = !account.subscription.isPremium;
-    const showOnboardingCallout = preferences.onboardingStatus !== 'completed';
+    const isPremium = account.subscription.isPremium;
+    const needsOnboarding = preferences.onboardingStatus !== 'completed';
+    const role = account.user.role;
 
     return (
-      <div className="recipesPage">
+      <div className="dashboardPage">
         <div className="pageIntro">
-          <h1>Account</h1>
-          <p>Manage your account, subscription, saved content, and Premium access.</p>
+          <p className="eyebrow">Account</p>
+          <h1>Your Nourivo control center.</h1>
+          <p>
+            Manage your profile, unlock Premium planning, keep preferences consistent, and
+            jump into the parts of the product you use every week.
+          </p>
         </div>
 
-        {showOnboardingCallout ? (
+        {needsOnboarding ? (
           <section className="panel">
-            <h2>Complete your Sprint 4 setup</h2>
+            <h2>Finish your setup</h2>
             <p>
-              Confirm your goal, language, and units so planner and shopping-list experiences can
-              reuse the same settings.
+              Confirm language, units, and your planning goal so the planner, pantry, and
+              shopping experience can stay aligned.
             </p>
             <div className="filterActions">
-              <Link href={withLocale(locale, '/account/onboarding')}>Finish onboarding</Link>
+              <Link href={withLocale(locale, '/account/onboarding')} className="buttonPrimary">
+                Complete setup
+              </Link>
             </div>
           </section>
         ) : null}
 
-        <div className="recipeColumns">
+        <div className="recipeMetaGrid">
+          <section className="panel">
+            <h2>Membership</h2>
+            <p>
+              <strong>Plan:</strong> {isPremium ? 'Premium' : 'Free'}
+            </p>
+            <p>
+              <strong>Status:</strong> {account.subscription.status}
+            </p>
+            <p>
+              <strong>Role:</strong> {role}
+            </p>
+            {account.subscription.currentPeriodEnd ? (
+              <p>
+                <strong>Renews through:</strong>{' '}
+                {new Date(account.subscription.currentPeriodEnd).toLocaleDateString()}
+              </p>
+            ) : null}
+          </section>
+
           <section className="panel">
             <h2>Profile</h2>
             <p>
               <strong>Email:</strong> {account.user.email}
             </p>
             <p>
-              <strong>Role:</strong> {account.user.role}
+              <strong>Locale:</strong> {preferences.locale.toUpperCase()}
             </p>
             <p>
-              <strong>Subscription status:</strong> {account.subscription.status}
-            </p>
-            <p>
-              <strong>Premium:</strong> {premiumLabel}
+              <strong>Units:</strong> {preferences.unitSystem}
             </p>
             <p>
               <strong>Onboarding:</strong> {preferences.onboardingStatus}
             </p>
-            {account.subscription.currentPeriodEnd ? (
-              <p>
-                <strong>Current period end:</strong> {account.subscription.currentPeriodEnd}
-              </p>
-            ) : null}
           </section>
-
-          <AccountPreferencesPanel />
         </div>
 
         <div className="recipeColumns">
           <section className="panel">
-            <h2>MVP tools</h2>
-            <ul className="ingredientList">
-              <li>
-                <Link href={withLocale(locale, '/favorites')}>Open favorites</Link>
-              </li>
-              <li>
-                <Link href={withLocale(locale, '/shopping-list')}>Open shopping list</Link>
-              </li>
-              <li>
-                <Link href={withLocale(locale, '/pantry')}>Open pantry</Link>
-              </li>
-              <li>
-                <Link href={withLocale(locale, '/planner')}>Open meal planner</Link>{' '}
-                <small className="muted">Premium-gated Sprint 4 entry point.</small>
-              </li>
-              <li>
-                <Link href={withLocale(locale, '/account/onboarding')}>Complete Sprint 4 setup</Link>
-              </li>
-            </ul>
+            <h2>Premium access</h2>
+            <p>
+              Premium unlocks planner-led weekly execution, fast meal scheduling, and the
+              strongest cross-feature workflow in Nourivo.
+            </p>
+            <div className="plannerSidebar">
+              {!isPremium ? (
+                <BillingRedirectButton
+                  endpoint="/api/billing/checkout"
+                  idleLabel="Start Premium checkout"
+                  loadingLabel="Opening checkout..."
+                  eventName="checkout_started"
+                  eventProps={{ surface: 'account', plan: 'premium' }}
+                />
+              ) : (
+                <p className="statusMessage">Premium is already active on this account.</p>
+              )}
+
+              <BillingRedirectButton
+                endpoint="/api/billing/portal"
+                idleLabel="Open billing portal"
+                loadingLabel="Opening billing portal..."
+                disabled={!account.subscription.stripeCustomerId}
+              />
+            </div>
           </section>
 
           <section className="panel">
-            <h2>Premium access</h2>
+            <h2>Quick actions</h2>
+            <ul className="ingredientList">
+              <li>
+                <Link href={withLocale(locale, '/planner')} className="cardLink">
+                  Open planner
+                </Link>
+              </li>
+              <li>
+                <Link href={withLocale(locale, '/shopping-list')} className="cardLink">
+                  Open shopping list
+                </Link>
+              </li>
+              <li>
+                <Link href={withLocale(locale, '/pantry')} className="cardLink">
+                  Review pantry
+                </Link>
+              </li>
+              <li>
+                <Link href={withLocale(locale, '/favorites')} className="cardLink">
+                  View favorites
+                </Link>
+              </li>
+              {role === 'ADMIN' ? (
+                <li>
+                  <Link href={withLocale(locale, '/admin')} className="cardLink">
+                    Open admin dashboard
+                  </Link>
+                </li>
+              ) : null}
+            </ul>
+          </section>
+        </div>
+
+        <div className="recipeColumns">
+          <AccountPreferencesPanel />
+
+          <section className="panel">
+            <h2>Launch notes</h2>
             <p>
-              Premium unlocks meal planner access and other paywalled Sprint 4 entry points.
+              This account surface is already wired into authentication, subscriptions, and
+              user preferences. It is the main handoff point into planner, pantry, and
+              billing flows.
             </p>
-            <div className="filterActions">
-              {showCheckout ? (
-                <form action="/api/billing/checkout" method="POST">
-                  <TrackedSubmitButton
-                    type="submit"
-                    eventName="checkout_started"
-                    eventProps={{ surface: 'account', plan: 'premium' }}
-                  >
-                    Start Premium checkout
-                  </TrackedSubmitButton>
-                </form>
-              ) : (
-                <p className="statusMessage">You already have Premium access.</p>
-              )}
-              <form action="/api/billing/portal" method="POST">
-                <button type="submit">Open billing portal</button>
-              </form>
-            </div>
+            <p className="muted">
+              If your Stripe env vars are missing, checkout and portal routes will stay
+              unavailable until production secrets are configured.
+            </p>
           </section>
         </div>
       </div>

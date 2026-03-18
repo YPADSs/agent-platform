@@ -7,6 +7,7 @@ type PatchPantryRequestBody = {
   unit?: unknown;
   displayName?: unknown;
   note?: unknown;
+  lastConfirmedAt?: unknown;
 };
 
 type Params = {
@@ -39,6 +40,23 @@ function asOptionalNumber(value: unknown) {
   return undefined;
 }
 
+function asOptionalDate(value: unknown) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (value === null || value === '') {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+  }
+
+  return undefined;
+}
+
 export async function PATCH(req: Request, { params }: Params) {
   try {
     const session = await requireSession();
@@ -53,9 +71,14 @@ export async function PATCH(req: Request, { params }: Params) {
     const unit = asOptionalString(body.unit);
     const displayName = asOptionalString(body.displayName);
     const note = asOptionalString(body.note);
+    const lastConfirmedAt = asOptionalDate(body.lastConfirmedAt);
 
     if (body.quantity !== undefined && quantity === undefined) {
       return NextResponse.json({ error: 'INVALID_QUANTITY' }, { status: 422 });
+    }
+
+    if (body.lastConfirmedAt !== undefined && lastConfirmedAt === undefined) {
+      return NextResponse.json({ error: 'INVALID_LAST_CONFIRMED_AT' }, { status: 422 });
     }
 
     const item = await updatePantryItemByEmail(email, params.itemId, {
@@ -63,6 +86,7 @@ export async function PATCH(req: Request, { params }: Params) {
       ...(body.unit !== undefined ? { unit } : {}),
       ...(body.displayName !== undefined ? { displayName } : {}),
       ...(body.note !== undefined ? { note } : {}),
+      ...(body.lastConfirmedAt !== undefined ? { lastConfirmedAt } : {}),
     });
 
     return NextResponse.json({ ok: true, item });

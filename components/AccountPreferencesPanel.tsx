@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 const LOCALE_OPTIONS = [
   { value: 'en', label: 'English' },
-  { value: 'fr', label: 'Français' },
+  { value: 'fr', label: 'Francais' },
   { value: 'de', label: 'Deutsch' },
-  { value: 'es', label: 'Español' },
+  { value: 'es', label: 'Espanol' },
   { value: 'it', label: 'Italiano' },
 ] as const;
 
@@ -77,8 +77,7 @@ export default function AccountPreferencesPanel() {
 
         if (!preferencesResponse.ok || !entitlementsResponse.ok) {
           if (isActive) {
-            setError('Unable to load your Sprint 4 preferences right now.');
-            setLoading(false);
+            setError('Unable to load your account preferences right now.');
           }
           return;
         }
@@ -107,7 +106,7 @@ export default function AccountPreferencesPanel() {
 
   const plannerStatusText = useMemo(() => {
     if (entitlements.canUsePlanner) {
-      return 'Planner is available on this account.';
+      return 'Planner access is active for this account.';
     }
 
     return 'Planner remains Premium-gated until you upgrade.';
@@ -157,17 +156,14 @@ export default function AccountPreferencesPanel() {
 
   return (
     <section className="panel">
-      <h2>Sprint 4 preferences</h2>
-      <p>Manage your language, units, goal placeholder, and onboarding status.</p>
+      <h2>Preferences</h2>
+      <p>Keep language, units, and onboarding state aligned across the product.</p>
       <p className="muted">{plannerStatusText}</p>
 
       <form className="preferencesForm" onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="goalCode">Goal placeholder</label>
+        <label className="field fieldWide">
+          <span>Goal code</span>
           <input
-            id="goalCode"
-            name="goalCode"
-            type="text"
             value={preferences.goalCode ?? ''}
             onChange={(event) =>
               setPreferences((prev) => ({
@@ -177,13 +173,11 @@ export default function AccountPreferencesPanel() {
             }
             placeholder="balanced_eating"
           />
-        </div>
+        </label>
 
-        <div className="field">
-          <label htmlFor="locale">Language</label>
+        <label className="field">
+          <span>Language</span>
           <select
-            id="locale"
-            name="locale"
             value={preferences.locale}
             onChange={(event) =>
               setPreferences((prev) => ({
@@ -198,13 +192,11 @@ export default function AccountPreferencesPanel() {
               </option>
             ))}
           </select>
-        </div>
+        </label>
 
-        <div className="field">
-          <label htmlFor="unitSystem">Units</label>
+        <label className="field">
+          <span>Units</span>
           <select
-            id="unitSystem"
-            name="unitSystem"
             value={preferences.unitSystem}
             onChange={(event) =>
               setPreferences((prev) => ({
@@ -219,13 +211,11 @@ export default function AccountPreferencesPanel() {
               </option>
             ))}
           </select>
-        </div>
+        </label>
 
-        <div className="field">
-          <label htmlFor="onboardingStatus">Onboarding status</label>
+        <label className="field fieldWide">
+          <span>Onboarding status</span>
           <select
-            id="onboardingStatus"
-            name="onboardingStatus"
             value={preferences.onboardingStatus}
             onChange={(event) =>
               setPreferences((prev) => ({
@@ -240,9 +230,9 @@ export default function AccountPreferencesPanel() {
               </option>
             ))}
           </select>
-        </div>
+        </label>
 
-        <div className="preferencesActions">
+        <div className="preferencesActions fieldWide">
           <button type="submit" disabled={saving}>
             {saving ? 'Saving...' : 'Save preferences'}
           </button>
