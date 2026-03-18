@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ViewTracker from '@/components/ViewTracker';
 import RecipeActions from '@/components/RecipeActions';
+import RecipeSubstitutions from '@/components/RecipeSubstitutions';
 import { getRecipeDetail } from '@/lib/recipes';
 import {
   getAbsoluteUrl,
@@ -46,12 +47,7 @@ export async function generateMetadata({ params }: RecipeMetadataProps): Promise
       canonical,
       languages: getContentDetailAlternates('recipes', recipe.slug),
     },
-    openGraph: {
-      title: recipe.title,
-      description: recipe.description,
-      url: canonical,
-      type: 'article',
-    },
+    openGraph: {},
   };
 }
 
@@ -77,7 +73,7 @@ export default async function RecipeDetailPage({
       <ViewTracker kind="recipe" slug={recipe.slug} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTMLõ{{ __html: JSON.stringify(schema) }}
       />
       <article className="recipeDetail">
         <header className="recipeHero">
@@ -146,6 +142,11 @@ export default async function RecipeDetailPage({
               ))}
             </ul>
           </section>
+
+          <RecipeSubstitutions ingredients={recipe.ingredients.map((ingredient) => ({
+            name: ingredient.name,
+            text: ingredient.text,
+          }))} />
 
           <section className="panel">
             <h2>Method</h2>
