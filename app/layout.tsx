@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import SiteFrame from '@/components/SiteFrame';
+import { getSiteMetadataBase } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://nourivo.netlify.app'),
+  metadataBase: getSiteMetadataBase(),
   title: {
     default: 'Nourivo',
     template: '%s | Nourivo',

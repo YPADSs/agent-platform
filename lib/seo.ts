@@ -1,8 +1,23 @@
 import type { Metadata } from 'next';
 import { defaultLocale, locales, type Locale } from '@/i18n';
 
+const FALLBACK_SITE_URL = 'https://nourivo.netlify.app';
+
 export function getSiteBaseUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL || 'https://nourivo.netlify.app';
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (raw) {
+    try {
+      return new URL(raw).toString().replace(/\/$/, '');
+    } catch {
+      return FALLBACK_SITE_URL;
+    }
+  }
+
+  return FALLBACK_SITE_URL;
+}
+
+export function getSiteMetadataBase() {
+  return new URL(getSiteBaseUrl());
 }
 
 export function getAbsoluteUrl(path: string) {
