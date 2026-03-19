@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Nourivo">
+  <defs>
+    <linearGradient id="nourivoGradient" x1="16" y1="12" x2="108" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0bb66" />
+      <stop offset="1" stop-color="#d8682c" />
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="108" height="108" rx="30" fill="url(#nourivoGradient)" />
+  <path
+    d="M38 89V39h11l30 32V39h11v50H79L49 57v32H38Z"
+    fill="#fff8f1"
+  />
+</svg>

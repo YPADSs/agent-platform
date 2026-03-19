@@ -114,7 +114,7 @@ export default async function HomePage() {
               <h3>{recipe.title}</h3>
               <p>{recipe.description}</p>
               <p className="muted">
-                {recipe.nutrition.calories} kcal • {recipe.nutrition.protein}g protein
+                {recipe.nutrition.calories} kcal / {recipe.nutrition.protein}g protein
               </p>
               <Link href={`/recipes/${recipe.slug}`} className="cardLink">
                 Open recipe

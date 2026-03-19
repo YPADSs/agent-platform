@@ -106,7 +106,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
               <li key={`${user.email}-${user.createdAt.toISOString()}`}>
                 <strong>{user.email}</strong>
                 <span className="muted">
-                  {user.role} • joined {user.createdAt.toLocaleDateString()}
+                  {user.role} / joined {user.createdAt.toLocaleDateString()}
                 </span>
               </li>
             ))}

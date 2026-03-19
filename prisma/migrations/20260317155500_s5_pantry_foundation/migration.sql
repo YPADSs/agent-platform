@@ -32,7 +32,7 @@ CREATE TABLE "PantryItem" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "IngredientCatalog_key_key" ON "IngredientCatalog"("ey");
+CREATE UNIQUE INDEX "IngredientCatalog_key_key" ON "IngredientCatalog"("key");
 
 -- CreateIndex
 CREATE INDEX "IngredientCatalog_categoryKey_idx" ON "IngredientCatalog"("categoryKey");

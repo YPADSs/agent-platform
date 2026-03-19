@@ -133,15 +133,17 @@ export async function hasBillingEvent(eventId: string) {
   const prisma = getPrisma();
   const event = await prisma.billingEvent.findUnique({
     where: { stripeEventId: eventId },
-    select: { id: true },
+    select: { processedAt: true },
   });
-  return Boolean(event);
+  return Boolean(event?.processedAt);
 }
 
 export async function recordBillingEvent(eventId: string, type: string) {
   const prisma = getPrisma();
-  return prisma.billingEvent.create({
-    data: { stripeEventId: eventId, type },
+  return prisma.billingEvent.upsert({
+    where: { stripeEventId: eventId },
+    create: { stripeEventId: eventId, type },
+    update: { type },
   });
 }
 

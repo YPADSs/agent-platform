@@ -1,0 +1,5 @@
+-- RenameIndex
+ALTER INDEX "IngredientSubstitutionRule_sourceCategoryKey_isActive_sortOrder" RENAME TO "IngredientSubstitutionRule_sourceCategoryKey_isActive_sortO_idx";
+
+-- RenameIndex
+ALTER INDEX "IngredientSubstitutionRule_sourceIngredientId_isActive_sortOrde" RENAME TO "IngredientSubstitutionRule_sourceIngredientId_isActive_sort_idx";

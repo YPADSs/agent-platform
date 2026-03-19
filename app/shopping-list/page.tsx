@@ -232,7 +232,7 @@ export default function ShoppingListPage({ params }: ShoppingListPageProps) {
         {plannerList ? (
           <>
             <p className="resultsMeta">
-              {plannerItemCount} aggregated item{plannerItemCount === 1 ? '' : 's'} • unit system:{' '}
+              {plannerItemCount} aggregated item{plannerItemCount === 1 ? '' : 's'} / unit system:{' '}
               {plannerList.unitSystem || 'metric'}
             </p>
             {plannerList.items.length ? (
@@ -241,7 +241,7 @@ export default function ShoppingListPage({ params }: ShoppingListPageProps) {
                   <li key={item.ingredientKey}>
                     <strong>{item.displayName}</strong>
                     <span className="muted">
-                      {item.quantity} {item.unit} • {item.sourceCount} recipe
+                      {item.quantity} {item.unit} / {item.sourceCount} recipe
                       {item.sourceCount === 1 ? '' : 's'}
                     </span>
                   </li>
@@ -320,7 +320,7 @@ export default function ShoppingListPage({ params }: ShoppingListPageProps) {
           <p className="resultsMeta">
             {loading
               ? 'Loading shopping list...'
-              : `${items.length} item${items.length === 1 ? '' : 's'} • ${checkedCount} checked`}
+              : `${items.length} item${items.length === 1 ? '' : 's'} / ${checkedCount} checked`}
           </p>
 
           {items.length ? (

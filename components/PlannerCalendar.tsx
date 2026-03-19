@@ -614,14 +614,14 @@ export default function PlannerCalendar() {
           {autoplan ? (
             <>
               <p className="resultsMeta">
-                {autoplan.summary.items} items • {autoplan.summary.pantryMatches} pantry-aware picks
+                {autoplan.summary.items} items / {autoplan.summary.pantryMatches} pantry-aware picks
               </p>
               <ul className="plannerItemList">
                 {autoplan.items.slice(0, 8).map((item) => (
                   <li key={`${item.date}-${item.slot}-${item.recipe.slug}`} className="plannerItemRow">
                     <div>
                       <strong>
-                        {item.date} • {SLOT_LABELS[item.slot]}
+                        {item.date} / {SLOT_LABELS[item.slot]}
                       </strong>
                       <p>{item.recipe.title}</p>
                       <p className="muted">{item.reason}</p>
@@ -640,14 +640,14 @@ export default function PlannerCalendar() {
           {shoppingList ? (
             <>
               <p className="resultsMeta">
-                {shoppingList.items.length} aggregated item{shoppingList.items.length === 1 ? '' : 's'} • {shoppingList.unitSystem}
+                {shoppingList.items.length} aggregated item{shoppingList.items.length === 1 ? '' : 's'} / {shoppingList.unitSystem}
               </p>
               <ul className="ingredientList">
                 {shoppingList.items.slice(0, 8).map((item) => (
                   <li key={item.ingredientKey}>
                     <strong>{item.displayName}</strong>
                     <span className="muted">
-                      {item.quantity} {item.unit} • {item.sourceCount} recipe
+                      {item.quantity} {item.unit} / {item.sourceCount} recipe
                       {item.sourceCount === 1 ? '' : 's'}
                     </span>
                   </li>

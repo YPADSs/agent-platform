@@ -23,6 +23,7 @@ body {
     radial-gradient(circle at top right, rgba(113, 178, 146, 0.18), transparent 28%),
     linear-gradient(180deg, #fbf4ea 0%, #f3eadc 100%);
   font-family: 'Trebuchet MS', 'Segoe UI Variable', 'Segoe UI', sans-serif;
+  line-height: 1.55;
 }
 
 a {
@@ -247,6 +248,19 @@ button,
   gap: 1rem;
 }
 
+.marketingCard,
+.showcaseCard,
+.panel,
+.recipeCard,
+.emptyState,
+.premiumBanner,
+.heroMetric,
+.heroFeatureCard {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+}
+
 .landingHero h1,
 .pageIntro h1,
 .recipeHero h1 {
@@ -268,6 +282,29 @@ button,
 .recipeHero {
   display: grid;
   gap: 0.75rem;
+}
+
+.sectionHeading > div,
+.heroFeatureHeader,
+.recipeCardHeader {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.landingPage h2,
+.landingPage h3,
+.recipesPage h2,
+.recipesPage h3,
+.recipeDetail h2,
+.recipeDetail h3,
+.dashboardPage h2,
+.dashboardPage h3,
+.plannerLayout h2,
+.plannerLayout h3,
+.authPage h2,
+.authPage h3 {
+  margin: 0;
+  line-height: 1.15;
 }
 
 .pageIntro p,
@@ -307,11 +344,24 @@ button,
 
 .featureChecklist,
 .ingredientList,
-.stepsList {
+.stepsList,
+.recipeGrid {
   margin: 0;
-  padding-left: 1.2rem;
+  padding: 0;
+  list-style: none;
   display: grid;
   gap: 0.75rem;
+}
+
+.featureChecklist li,
+.ingredientList li,
+.stepsList li {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(124, 98, 73, 0.11);
 }
 
 .sectionHeading,

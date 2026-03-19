@@ -12,7 +12,7 @@
 # Webhook routing (optional convenience path)
 [[redirects]]
   from = "/webhooks/stripe"
-  to = "/.netlify/functions/stripe-webhook"
+  to = "/api/billing/webhook"
   status = 200
   force = true
 

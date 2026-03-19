@@ -1,10 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-
-import recipesFromFile from './fixtures/recipes.json' assert { type: 'json' };
-import articlesFromFile from './fixtures/articles.json' assert { type: 'json' };
-import substitutionsFromFile from './fixtures/substitutions.json' assert { type: 'json' };
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const prisma = new PrismaClient();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 type FixtureItem = { slug: string; title: string; body: string };
 type SubstitutionFixture = {
@@ -19,9 +20,11 @@ type SubstitutionFixture = {
   sortOrder: number;
 };
 
-const recipes = recipesFromFile as FixtureItem[];
-const articles = articlesFromFile as FixtureItem[];
-const substitutions = substitutionsFromFile as SubstitutionFixture[];
+async function loadFixture<T>(filename: string): Promise<T> {
+  const filepath = path.join(__dirname, 'fixtures', filename);
+  const contents = await readFile(filepath, 'utf8');
+  return JSON.parse(contents) as T;
+}
 
 async function upsertIngredient(input: {
   key: string;
@@ -43,7 +46,7 @@ async function upsertIngredient(input: {
   });
 }
 
-async function seedSubstitutions() {
+async function seedSubstitutions(substitutions: SubstitutionFixture[]) {
   for (const item of substitutions) {
     const substituteIngredient = await upsertIngredient({
       key: item.substituteKey,
@@ -83,9 +86,13 @@ async function seedSubstitutions() {
 }
 
 async function main() {
+  const recipes = await loadFixture<FixtureItem[]>('recipes.json');
+  const articles = await loadFixture<FixtureItem[]>('articles.json');
+  const substitutions = await loadFixture<SubstitutionFixture[]>('substitutions.json');
+
   await prisma.recipe.createMany({ data: recipes, skipDuplicates: true });
   await prisma.article.createMany({ data: articles, skipDuplicates: true });
-  await seedSubstitutions();
+  await seedSubstitutions(substitutions);
 }
 
 main()
