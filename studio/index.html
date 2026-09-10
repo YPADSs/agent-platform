@@ -8,7 +8,9 @@
   <title>YPADS Studio — сайты, которые проще понять и удобнее использовать</title>
   <style>
     :root{--bg:#080b14;--panel:#101626;--panel2:#151d31;--text:#f5f7fb;--muted:#a9b4c7;--line:rgba(255,255,255,.09);--accent:#7c5cff;--accent2:#24c8a5;--max:1180px}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 80% 0,#18213d 0,transparent 34%),radial-gradient(circle at 0 30%,#15102e 0,transparent 30%),var(--bg);color:var(--text);line-height:1.55}a{color:inherit;text-decoration:none}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}.top{position:sticky;top:0;z-index:20;background:rgba(8,11,20,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}.nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-weight:800;letter-spacing:-.03em;font-size:20px}.brand span{color:#9f8cff}.navlinks{display:flex;align-items:center;gap:24px;color:var(--muted);font-size:14px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#5f7cff);font-weight:700;border:1px solid transparent;box-shadow:0 10px 28px rgba(124,92,255,.22);transition:.2s}.btn:hover{transform:translateY(-1px)}.btn.secondary{background:transparent;border-color:var(--line);box-shadow:none;color:var(--text)}.hero{padding:105px 0 78px}.heroGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:#b9adff;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.eyebrow:before{content:"";width:28px;height:1px;background:#9b8aff}h1{font-size:clamp(46px,7vw,82px);line-height:.96;letter-spacing:-.055em;margin:20px 0 24px;max-width:850px}.lead{font-size:20px;color:var(--muted);max-width:720px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}.heroCard{border:1px solid var(--line);border-radius:28px;padding:28px;background:linear-gradient(160deg,rgba(255,255,255,.065),rgba(255,255,255,.02));box-shadow:0 30px 80px rgba(0,0,0,.28)}.mock{height:340px;border-radius:20px;background:linear-gradient(145deg,#1a2440,#0d1324);border:1px solid rgba(255,255,255,.08);padding:20px;overflow:hidden;position:relative}.mock:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--accent2),transparent 65%);right:-70px;bottom:-80px;opacity:.35}.mockTop{display:flex;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:#5a6374}.mockLine{height:10px;border-radius:6px;background:rgba(255,255,255,.1);margin-top:18px}.mockLine.w1{width:72%}.mockLine.w2{width:46%}.mockLine.w3{width:84%}.mockTitle{font-size:34px;line-height:1.05;font-weight:800;letter-spacing:-.04em;margin:38px 0 16px;max-width:280px}.mockButton{display:inline-block;margin-top:18px;padding:10px 15px;border-radius:10px;background:var(--accent);font-weight:700;font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}.stat{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.stat b{display:block;font-size:28px;letter-spacing:-.04em}.stat span{font-size:12px;color:var(--muted)}section{padding:84px 0}.sectionHead{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:34px}.sectionHead h2{font-size:clamp(34px,5vw,54px);letter-spacing:-.045em;line-height:1.02;margin:0}.sectionHead p{max-width:560px;color:var(--muted);margin:0}.process{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.step,.service,.case,.contactCard{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:20px;padding:24px}.stepNum{font-size:13px;color:#9e90ff;font-weight:800;margin-bottom:42px}.step h3,.service h3,.case h3{margin:0 0 10px;font-size:20px}.step p,.service p,.case p{color:var(--muted);margin:0}.portfolio{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.case{min-height:240px;display:flex;flex-direction:column;justify-content:space-between;transition:.2s}.case:hover{transform:translateY(-3px);border-color:rgba(159,140,255,.45)}.caseMeta{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px;margin-bottom:30px}.case .view{margin-top:28px;font-weight:800;color:#b9adff}.note{margin-top:18px;padding:16px 18px;border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:13px;background:rgba(255,255,255,.02)}.services{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.service strong{display:block;margin-top:24px;font-size:14px;color:#c5bbff}.cta{padding:0 0 90px}.ctaBox{border:1px solid var(--line);border-radius:30px;padding:52px;background:linear-gradient(135deg,rgba(124,92,255,.17),rgba(36,200,165,.08));display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center}.ctaBox h2{font-size:clamp(32px,5vw,52px);line-height:1.02;letter-spacing:-.045em;margin:0 0 12px}.ctaBox p{color:var(--muted);margin:0;max-width:650px}.contacts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.contactCard small{display:block;color:var(--muted);margin-bottom:8px}.contactCard b{font-size:18px}.footer{border-top:1px solid var(--line);padding:30px 0 42px;color:var(--muted);font-size:13px}.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}@media(max-width:900px){.navlinks a:not(.btn){display:none}.heroGrid{grid-template-columns:1fr}.hero{padding-top:74px}.process,.services{grid-template-columns:repeat(2,1fr)}.portfolio{grid-template-columns:1fr}.ctaBox{grid-template-columns:1fr}.contacts{grid-template-columns:1fr}.sectionHead{display:block}.sectionHead p{margin-top:14px}}@media(max-width:560px){.wrap{width:min(var(--max),calc(100% - 24px))}.nav{height:64px}.hero{padding:58px 0 50px}h1{font-size:46px}.lead{font-size:17px}.heroCard{padding:14px}.mock{height:290px}.stats{grid-template-columns:1fr}.process,.services{grid-template-columns:1fr}section{padding:58px 0}.ctaBox{padding:28px}.btn{width:100%}.actions{display:grid}.nav .btn{width:auto}.case{min-height:210px}}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 80% 0,#18213d 0,transparent 34%),radial-gradient(circle at 0 30%,#15102e 0,transparent 30%),var(--bg);color:var(--text);line-height:1.55}a{color:inherit;text-decoration:none}button{font:inherit;color:inherit}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}.top{position:sticky;top:0;z-index:20;background:rgba(8,11,20,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}.nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-weight:800;letter-spacing:-.03em;font-size:20px}.brand span{color:#9f8cff}.navlinks{display:flex;align-items:center;gap:24px;color:var(--muted);font-size:14px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#5f7cff);font-weight:700;border:1px solid transparent;box-shadow:0 10px 28px rgba(124,92,255,.22);transition:.2s;cursor:pointer}.btn:hover{transform:translateY(-1px)}.btn.secondary{background:transparent;border-color:var(--line);box-shadow:none;color:var(--text)}.hero{padding:105px 0 78px}.heroGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:#b9adff;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.eyebrow:before{content:"";width:28px;height:1px;background:#9b8aff}h1{font-size:clamp(46px,7vw,82px);line-height:.96;letter-spacing:-.055em;margin:20px 0 24px;max-width:850px}.lead{font-size:20px;color:var(--muted);max-width:720px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}.heroCard{border:1px solid var(--line);border-radius:28px;padding:28px;background:linear-gradient(160deg,rgba(255,255,255,.065),rgba(255,255,255,.02));box-shadow:0 30px 80px rgba(0,0,0,.28)}.mock{height:340px;border-radius:20px;background:linear-gradient(145deg,#1a2440,#0d1324);border:1px solid rgba(255,255,255,.08);padding:20px;overflow:hidden;position:relative}.mock:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--accent2),transparent 65%);right:-70px;bottom:-80px;opacity:.35;pointer-events:none}.mockTop{display:flex;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:#5a6374}.mockLine{height:10px;border-radius:6px;background:rgba(255,255,255,.1);margin-top:18px}.mockLine.w1{width:72%}.mockLine.w2{width:46%}.mockLine.w3{width:84%}.mockTitle{font-size:34px;line-height:1.05;font-weight:800;letter-spacing:-.04em;margin:38px 0 16px;max-width:280px}.mockButton{display:inline-block;margin-top:18px;padding:10px 15px;border-radius:10px;background:var(--accent);font-weight:700;font-size:13px;border:0;cursor:pointer;position:relative;z-index:2}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}.stat{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.stat b{display:block;font-size:28px;letter-spacing:-.04em}.stat span{font-size:12px;color:var(--muted)}section{padding:84px 0}.sectionHead{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:34px}.sectionHead h2{font-size:clamp(34px,5vw,54px);letter-spacing:-.045em;line-height:1.02;margin:0}.sectionHead p{max-width:560px;color:var(--muted);margin:0}.process{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.step,.service,.case,.contactCard{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:20px;padding:24px}.stepNum{font-size:13px;color:#9e90ff;font-weight:800;margin-bottom:42px}.step h3,.service h3,.case h3{margin:0 0 10px;font-size:20px}.step p,.service p,.case p{color:var(--muted);margin:0}.portfolio{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.case{min-height:240px;display:flex;flex-direction:column;justify-content:space-between;transition:.2s}.case:hover{transform:translateY(-3px);border-color:rgba(159,140,255,.45)}.caseMeta{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px;margin-bottom:30px}.case .view{margin-top:28px;font-weight:800;color:#b9adff}.note{margin-top:18px;padding:16px 18px;border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:13px;background:rgba(255,255,255,.02)}.services{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.service strong{display:block;margin-top:24px;font-size:14px;color:#c5bbff}.cta{padding:0 0 90px}.ctaBox{border:1px solid var(--line);border-radius:30px;padding:52px;background:linear-gradient(135deg,rgba(124,92,255,.17),rgba(36,200,165,.08));display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center}.ctaBox h2{font-size:clamp(32px,5vw,52px);line-height:1.02;letter-spacing:-.045em;margin:0 0 12px}.ctaBox p{color:var(--muted);margin:0;max-width:650px}.contacts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.contactCard small{display:block;color:var(--muted);margin-bottom:8px}.contactCard b{font-size:18px}.footer{border-top:1px solid var(--line);padding:30px 0 42px;color:var(--muted);font-size:13px}.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .modalBackdrop{position:fixed;inset:0;z-index:100;background:rgba(3,6,14,.78);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px}.modalBackdrop.open{display:flex}.modal{width:min(620px,100%);max-height:calc(100vh - 40px);overflow:auto;border:1px solid var(--line);border-radius:24px;background:#0e1423;box-shadow:0 30px 100px rgba(0,0,0,.55);padding:28px}.modalTop{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px}.modalTop h2{margin:0 0 7px;font-size:30px;line-height:1.05;letter-spacing:-.035em}.modalTop p{margin:0;color:var(--muted);font-size:14px}.modalClose{width:40px;height:40px;flex:0 0 40px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);cursor:pointer;font-size:23px;line-height:1}.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:7px;margin-bottom:14px}.field.full{grid-column:1/-1}.field label{font-size:13px;font-weight:700;color:#dbe2ef}.field input,.field textarea{width:100%;border:1px solid var(--line);background:#0a0f1c;color:var(--text);border-radius:12px;padding:13px 14px;outline:none;font:inherit}.field textarea{min-height:120px;resize:vertical}.field input:focus,.field textarea:focus{border-color:rgba(159,140,255,.65);box-shadow:0 0 0 3px rgba(124,92,255,.1)}.mailActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}.mailHint{font-size:12px;color:var(--muted);margin:14px 0 0}.siteField.hidden{display:none}.mailAddress{color:#b9adff;font-weight:700}
+    @media(max-width:900px){.navlinks a:not(.btn){display:none}.heroGrid{grid-template-columns:1fr}.hero{padding-top:74px}.process,.services{grid-template-columns:repeat(2,1fr)}.portfolio{grid-template-columns:1fr}.ctaBox{grid-template-columns:1fr}.contacts{grid-template-columns:1fr}.sectionHead{display:block}.sectionHead p{margin-top:14px}}@media(max-width:560px){.wrap{width:min(var(--max),calc(100% - 24px))}.nav{height:64px}.hero{padding:58px 0 50px}h1{font-size:46px}.lead{font-size:17px}.heroCard{padding:14px}.mock{height:290px}.stats{grid-template-columns:1fr}.process,.services{grid-template-columns:1fr}section{padding:58px 0}.ctaBox{padding:28px}.btn{width:100%}.actions{display:grid}.nav .btn{width:auto}.case{min-height:210px}.formGrid{grid-template-columns:1fr}.field.full{grid-column:auto}.mailActions{display:grid}.modal{padding:20px}.modalTop h2{font-size:26px}}
   </style>
 </head>
 <body>
@@ -17,7 +19,7 @@
       <a class="brand" href="#top">YPADS <span>Studio</span></a>
       <nav class="navlinks">
         <a href="#works">Работы</a><a href="#process">Как работаем</a><a href="#services">Услуги</a><a href="#contacts">Контакты</a>
-        <a class="btn" href="mailto:nikita.nikita.290ch@gmail.com?subject=Хочу%20обсудить%20сайт">Обсудить сайт</a>
+        <button class="btn contact-trigger" type="button" data-mode="general">Обсудить сайт</button>
       </nav>
     </div>
   </header>
@@ -31,7 +33,7 @@
           <p class="lead">Анализируем существующий сайт, создаём современный концепт и превращаем его в понятный, быстрый и удобный инструмент для бизнеса.</p>
           <div class="actions">
             <a class="btn" href="#works">Посмотреть концепты</a>
-            <a class="btn secondary" href="https://t.me/YPADS">Написать в Telegram</a>
+            <a class="btn secondary" href="https://t.me/YPADS" target="_blank" rel="noopener">Написать в Telegram</a>
           </div>
         </div>
         <div class="heroCard">
@@ -39,7 +41,7 @@
             <div class="mockTop"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
             <div class="mockTitle">Сайт должен объяснять ценность бизнеса за несколько секунд.</div>
             <div class="mockLine w1"></div><div class="mockLine w2"></div><div class="mockLine w3"></div>
-            <span class="mockButton">Получить предложение</span>
+            <button class="mockButton contact-trigger" type="button" data-mode="general">Получить предложение</button>
           </div>
           <div class="stats">
             <div class="stat"><b>10+</b><span>опубликованных концептов</span></div>
@@ -96,7 +98,7 @@
     <section class="cta">
       <div class="wrap ctaBox">
         <div><h2>Хотите увидеть идею обновления своего сайта?</h2><p>Пришлите адрес сайта. Посмотрим текущую структуру и обсудим, что можно улучшить в первую очередь.</p></div>
-        <div class="actions"><a class="btn" href="mailto:nikita.nikita.290ch@gmail.com?subject=Хочу%20обновить%20сайт&body=Сайт:%20">Отправить сайт</a><a class="btn secondary" href="https://t.me/YPADS">Telegram</a></div>
+        <div class="actions"><button class="btn contact-trigger" type="button" data-mode="site">Отправить сайт</button><a class="btn secondary" href="https://t.me/YPADS" target="_blank" rel="noopener">Telegram</a></div>
       </div>
     </section>
 
@@ -104,14 +106,105 @@
       <div class="wrap">
         <div class="sectionHead"><h2>Связаться</h2><p>Можно написать удобным способом. Отвечает Никита.</p></div>
         <div class="contacts">
-          <a class="contactCard" href="mailto:nikita.nikita.290ch@gmail.com"><small>Email</small><b>nikita.nikita.290ch@gmail.com</b></a>
-          <a class="contactCard" href="https://t.me/YPADS"><small>Telegram</small><b>@YPADS</b></a>
-          <a class="contactCard" href="https://wa.me/79144051747"><small>WhatsApp</small><b>+7 914 405-17-47</b></a>
+          <button class="contactCard contact-trigger" type="button" data-mode="general" style="color:inherit;text-align:left;cursor:pointer"><small>Email</small><b>nikita.nikita.290ch@gmail.com</b></button>
+          <a class="contactCard" href="https://t.me/YPADS" target="_blank" rel="noopener"><small>Telegram</small><b>@YPADS</b></a>
+          <a class="contactCard" href="https://wa.me/79144051747" target="_blank" rel="noopener"><small>WhatsApp</small><b>+7 914 405-17-47</b></a>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="footer"><div class="wrap foot"><span>© 2026 YPADS Studio</span><span>Редизайн и разработка сайтов для бизнеса</span></div></footer>
+
+  <div class="modalBackdrop" id="contactModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+      <div class="modalTop">
+        <div><h2 id="contactTitle">Написать Никите</h2><p id="contactIntro">Заполните сообщение — мы откроем готовое письмо на адрес <span class="mailAddress">nikita.nikita.290ch@gmail.com</span>.</p></div>
+        <button class="modalClose" type="button" id="modalClose" aria-label="Закрыть">×</button>
+      </div>
+      <form id="contactForm">
+        <div class="formGrid">
+          <div class="field"><label for="contactName">Имя</label><input id="contactName" name="name" autocomplete="name" placeholder="Как к вам обращаться"></div>
+          <div class="field"><label for="contactCompany">Компания</label><input id="contactCompany" name="company" autocomplete="organization" placeholder="Название компании"></div>
+          <div class="field full siteField" id="siteField"><label for="contactSite">Адрес вашего сайта</label><input id="contactSite" name="site" inputmode="url" placeholder="https://example.ru"></div>
+          <div class="field full"><label for="contactMessage">Сообщение</label><textarea id="contactMessage" name="message" placeholder="Коротко расскажите, что хотите изменить или обсудить"></textarea></div>
+        </div>
+        <div class="mailActions">
+          <button class="btn" type="submit">Написать письмо</button>
+          <button class="btn secondary" type="button" id="defaultMail">Открыть в другой почте</button>
+        </div>
+        <p class="mailHint">Кнопка «Написать письмо» откроет окно создания письма в Gmail с уже заполненным адресом, темой и текстом. Если вы пользуетесь другой почтой, выберите второй вариант.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (()=>{
+      const email='nikita.nikita.290ch@gmail.com';
+      const modal=document.getElementById('contactModal');
+      const closeBtn=document.getElementById('modalClose');
+      const form=document.getElementById('contactForm');
+      const siteField=document.getElementById('siteField');
+      const siteInput=document.getElementById('contactSite');
+      const title=document.getElementById('contactTitle');
+      const intro=document.getElementById('contactIntro');
+      let mode='general';
+
+      function openModal(nextMode){
+        mode=nextMode||'general';
+        const isSite=mode==='site';
+        siteField.classList.toggle('hidden',!isSite);
+        siteInput.required=isSite;
+        title.textContent=isSite?'Прислать сайт':'Написать Никите';
+        intro.innerHTML=isSite
+          ?'Укажите адрес сайта — откроется готовое письмо на <span class="mailAddress">'+email+'</span>.'
+          :'Заполните сообщение — откроется готовое письмо на <span class="mailAddress">'+email+'</span>.';
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+        document.body.style.overflow='hidden';
+        setTimeout(()=>{(isSite?siteInput:document.getElementById('contactName')).focus()},50);
+      }
+
+      function closeModal(){
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden','true');
+        document.body.style.overflow='';
+      }
+
+      function mailData(){
+        const name=document.getElementById('contactName').value.trim();
+        const company=document.getElementById('contactCompany').value.trim();
+        const site=siteInput.value.trim();
+        const message=document.getElementById('contactMessage').value.trim();
+        const subject=mode==='site'?'Хочу обновить сайт':'Хочу обсудить сайт';
+        const parts=[];
+        if(name)parts.push('Имя: '+name);
+        if(company)parts.push('Компания: '+company);
+        if(site)parts.push('Сайт: '+site);
+        if(parts.length)parts.push('');
+        parts.push(message || (mode==='site'?'Здравствуйте! Хочу обсудить обновление нашего сайта.':'Здравствуйте! Хочу обсудить разработку или редизайн сайта.'));
+        return {subject,body:parts.join('\n')};
+      }
+
+      document.querySelectorAll('.contact-trigger').forEach(el=>el.addEventListener('click',()=>openModal(el.dataset.mode)));
+      closeBtn.addEventListener('click',closeModal);
+      modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeModal()});
+
+      form.addEventListener('submit',e=>{
+        e.preventDefault();
+        if(!form.reportValidity())return;
+        const {subject,body}=mailData();
+        const url='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(email)+'&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+        window.open(url,'_blank','noopener');
+      });
+
+      document.getElementById('defaultMail').addEventListener('click',()=>{
+        if(!form.reportValidity())return;
+        const {subject,body}=mailData();
+        window.location.href='mailto:'+email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+      });
+    })();
+  </script>
 </body>
 </html>
