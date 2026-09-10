@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="YPADS Studio — редизайн и разработка сайтов для бизнеса. Показываем концепт обновления до начала проекта.">
+  <meta name="theme-color" content="#0b1020">
+  <title>YPADS Studio — сайты, которые проще понять и удобнее использовать</title>
+  <style>
+    :root{--bg:#080b14;--panel:#101626;--panel2:#151d31;--text:#f5f7fb;--muted:#a9b4c7;--line:rgba(255,255,255,.09);--accent:#7c5cff;--accent2:#24c8a5;--max:1180px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 80% 0,#18213d 0,transparent 34%),radial-gradient(circle at 0 30%,#15102e 0,transparent 30%),var(--bg);color:var(--text);line-height:1.55}a{color:inherit;text-decoration:none}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}.top{position:sticky;top:0;z-index:20;background:rgba(8,11,20,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}.nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-weight:800;letter-spacing:-.03em;font-size:20px}.brand span{color:#9f8cff}.navlinks{display:flex;align-items:center;gap:24px;color:var(--muted);font-size:14px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#5f7cff);font-weight:700;border:1px solid transparent;box-shadow:0 10px 28px rgba(124,92,255,.22);transition:.2s}.btn:hover{transform:translateY(-1px)}.btn.secondary{background:transparent;border-color:var(--line);box-shadow:none;color:var(--text)}.hero{padding:105px 0 78px}.heroGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:#b9adff;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.eyebrow:before{content:"";width:28px;height:1px;background:#9b8aff}h1{font-size:clamp(46px,7vw,82px);line-height:.96;letter-spacing:-.055em;margin:20px 0 24px;max-width:850px}.lead{font-size:20px;color:var(--muted);max-width:720px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}.heroCard{border:1px solid var(--line);border-radius:28px;padding:28px;background:linear-gradient(160deg,rgba(255,255,255,.065),rgba(255,255,255,.02));box-shadow:0 30px 80px rgba(0,0,0,.28)}.mock{height:340px;border-radius:20px;background:linear-gradient(145deg,#1a2440,#0d1324);border:1px solid rgba(255,255,255,.08);padding:20px;overflow:hidden;position:relative}.mock:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--accent2),transparent 65%);right:-70px;bottom:-80px;opacity:.35}.mockTop{display:flex;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:#5a6374}.mockLine{height:10px;border-radius:6px;background:rgba(255,255,255,.1);margin-top:18px}.mockLine.w1{width:72%}.mockLine.w2{width:46%}.mockLine.w3{width:84%}.mockTitle{font-size:34px;line-height:1.05;font-weight:800;letter-spacing:-.04em;margin:38px 0 16px;max-width:280px}.mockButton{display:inline-block;margin-top:18px;padding:10px 15px;border-radius:10px;background:var(--accent);font-weight:700;font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}.stat{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.stat b{display:block;font-size:28px;letter-spacing:-.04em}.stat span{font-size:12px;color:var(--muted)}section{padding:84px 0}.sectionHead{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:34px}.sectionHead h2{font-size:clamp(34px,5vw,54px);letter-spacing:-.045em;line-height:1.02;margin:0}.sectionHead p{max-width:560px;color:var(--muted);margin:0}.process{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.step,.service,.case,.contactCard{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:20px;padding:24px}.stepNum{font-size:13px;color:#9e90ff;font-weight:800;margin-bottom:42px}.step h3,.service h3,.case h3{margin:0 0 10px;font-size:20px}.step p,.service p,.case p{color:var(--muted);margin:0}.portfolio{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.case{min-height:240px;display:flex;flex-direction:column;justify-content:space-between;transition:.2s}.case:hover{transform:translateY(-3px);border-color:rgba(159,140,255,.45)}.caseMeta{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px;margin-bottom:30px}.case .view{margin-top:28px;font-weight:800;color:#b9adff}.note{margin-top:18px;padding:16px 18px;border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:13px;background:rgba(255,255,255,.02)}.services{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.service strong{display:block;margin-top:24px;font-size:14px;color:#c5bbff}.cta{padding:0 0 90px}.ctaBox{border:1px solid var(--line);border-radius:30px;padding:52px;background:linear-gradient(135deg,rgba(124,92,255,.17),rgba(36,200,165,.08));display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center}.ctaBox h2{font-size:clamp(32px,5vw,52px);line-height:1.02;letter-spacing:-.045em;margin:0 0 12px}.ctaBox p{color:var(--muted);margin:0;max-width:650px}.contacts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.contactCard small{display:block;color:var(--muted);margin-bottom:8px}.contactCard b{font-size:18px}.footer{border-top:1px solid var(--line);padding:30px 0 42px;color:var(--muted);font-size:13px}.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}@media(max-width:900px){.navlinks a:not(.btn){display:none}.heroGrid{grid-template-columns:1fr}.hero{padding-top:74px}.process,.services{grid-template-columns:repeat(2,1fr)}.portfolio{grid-template-columns:1fr}.ctaBox{grid-template-columns:1fr}.contacts{grid-template-columns:1fr}.sectionHead{display:block}.sectionHead p{margin-top:14px}}@media(max-width:560px){.wrap{width:min(var(--max),calc(100% - 24px))}.nav{height:64px}.hero{padding:58px 0 50px}h1{font-size:46px}.lead{font-size:17px}.heroCard{padding:14px}.mock{height:290px}.stats{grid-template-columns:1fr}.process,.services{grid-template-columns:1fr}section{padding:58px 0}.ctaBox{padding:28px}.btn{width:100%}.actions{display:grid}.nav .btn{width:auto}.case{min-height:210px}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap nav">
+      <a class="brand" href="#top">YPADS <span>Studio</span></a>
+      <nav class="navlinks">
+        <a href="#works">Работы</a><a href="#process">Как работаем</a><a href="#services">Услуги</a><a href="#contacts">Контакты</a>
+        <a class="btn" href="mailto:nikita.nikita.290ch@gmail.com?subject=Хочу%20обсудить%20сайт">Обсудить сайт</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap heroGrid">
+        <div>
+          <span class="eyebrow">Редизайн и разработка сайтов</span>
+          <h1>Показываем, каким может стать ваш сайт, до начала проекта.</h1>
+          <p class="lead">Анализируем существующий сайт, создаём современный концепт и превращаем его в понятный, быстрый и удобный инструмент для бизнеса.</p>
+          <div class="actions">
+            <a class="btn" href="#works">Посмотреть концепты</a>
+            <a class="btn secondary" href="https://t.me/YPADS">Написать в Telegram</a>
+          </div>
+        </div>
+        <div class="heroCard">
+          <div class="mock">
+            <div class="mockTop"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="mockTitle">Сайт должен объяснять ценность бизнеса за несколько секунд.</div>
+            <div class="mockLine w1"></div><div class="mockLine w2"></div><div class="mockLine w3"></div>
+            <span class="mockButton">Получить предложение</span>
+          </div>
+          <div class="stats">
+            <div class="stat"><b>10+</b><span>опубликованных концептов</span></div>
+            <div class="stat"><b>1:1</b><span>индивидуальная подача</span></div>
+            <div class="stat"><b>0</b><span>шаблонных обещаний</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="process">
+      <div class="wrap">
+        <div class="sectionHead"><h2>Как мы работаем</h2><p>Сначала показываем направление. Только потом обсуждаем полноценную разработку, сроки и стоимость.</p></div>
+        <div class="process">
+          <article class="step"><div class="stepNum">01 / Анализ</div><h3>Разбираем текущий сайт</h3><p>Смотрим структуру, мобильную версию, подачу услуг, визуальную иерархию и путь к обращению.</p></article>
+          <article class="step"><div class="stepNum">02 / Концепт</div><h3>Показываем новую идею</h3><p>Создаём демонстрационную главную страницу на основе реальных услуг и данных компании.</p></article>
+          <article class="step"><div class="stepNum">03 / Разработка</div><h3>Собираем полный сайт</h3><p>После согласования направления переносим дизайн на нужные страницы и функциональность.</p></article>
+          <article class="step"><div class="stepNum">04 / Запуск</div><h3>Проверяем и публикуем</h3><p>Адаптив, производительность, формы, базовое SEO и финальная проверка перед запуском.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="works">
+      <div class="wrap">
+        <div class="sectionHead"><h2>Концепты редизайна</h2><p>Примеры того, как можно переосмыслить главную страницу в разных сферах бизнеса.</p></div>
+        <div class="portfolio">
+          <a class="case" href="../?demo=atr-8b7a56" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Логистика</span><span>Хабаровск</span></div><h3>АзияТранзитРегион</h3><p>Современная структура для сложного набора транспортных услуг с акцентом на быстрый выбор направления.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=sapsan-b2eedf" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Грузоперевозки</span><span>Хабаровск</span></div><h3>САПСАН Дальний Восток</h3><p>Подача региональных маршрутов, температурной доставки и ключевых преимуществ на одной странице.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=zashita-5b3a5a" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Системы безопасности</span><span>Хабаровск</span></div><h3>Группа компаний ЗАЩИТА</h3><p>Упрощённая навигация по направлениям безопасности и более заметный путь к обращению.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=komtisiz-2b9e4d" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Инженерные изыскания</span><span>Хабаровский край</span></div><h3>КомсомольскТИСИЗ</h3><p>Структурирование сложных технических услуг: геология, геодезия, экология и проектирование.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=sksdv-c0533f" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Металлоконструкции</span><span>Хабаровск</span></div><h3>СтройКомплектСервис</h3><p>Коммерческая подача производства, изготовления и монтажа металлоконструкций.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=empirey-b004cd" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Гидравлика</span><span>Хабаровск</span></div><h3>Эмпирей</h3><p>Более понятная презентация РВД, гидравлического оборудования и комплектующих для B2B-аудитории.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=mitpartner-a7f1c2" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Строительство</span><span>Хабаровск</span></div><h3>ПСК МИТ Партнер</h3><p>Фокус на специальных строительных технологиях, защите конструкций и понятной экспертной подаче.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=kargo-ee72fe" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Транспорт</span><span>Хабаровск</span></div><h3>Карго</h3><p>Простая логика выбора между контейнерными, сборными и автомобильными перевозками.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=videocom-f0c6e9" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Видеонаблюдение</span><span>Хабаровск</span></div><h3>Видеоком</h3><p>Современная презентация оборудования, монтажа, сервисного центра и систем безопасности.</p></div><span class="view">Открыть концепт →</span></a>
+          <a class="case" href="../?demo=premium-69ddfe" target="_blank" rel="noopener"><div><div class="caseMeta"><span>Управление недвижимостью</span><span>Хабаровск</span></div><h3>Группа компаний Премиум</h3><p>Понятная структура услуг управляющей компании и быстрый доступ к контактам и обращениям.</p></div><span class="view">Открыть концепт →</span></a>
+        </div>
+        <div class="note">Важно: работы выше — демонстрационные концепты редизайна для реальных компаний. Они показывают наш подход и не означают, что указанные компании являются клиентами YPADS Studio или заказывали эти работы.</div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="wrap">
+        <div class="sectionHead"><h2>Что можем сделать</h2><p>От точечного обновления существующего сайта до полной разработки нового корпоративного ресурса.</p></div>
+        <div class="services">
+          <article class="service"><h3>Редизайн сайта</h3><p>Пересоберём визуальную систему, структуру и ключевые сценарии без обязательной смены всего бизнеса-процесса.</p><strong>Для устаревших сайтов</strong></article>
+          <article class="service"><h3>Корпоративный сайт</h3><p>Структура, дизайн, адаптивная разработка, страницы услуг, формы и базовая SEO-подготовка.</p><strong>Для B2B и услуг</strong></article>
+          <article class="service"><h3>Landing page</h3><p>Посадочная страница под конкретный продукт, услугу, рекламу или отдельное направление компании.</p><strong>Для быстрого запуска</strong></article>
+          <article class="service"><h3>Развитие сайта</h3><p>Новые страницы, улучшение конверсии, контентные блоки, технические доработки и поддержка.</p><strong>После запуска</strong></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap ctaBox">
+        <div><h2>Хотите увидеть идею обновления своего сайта?</h2><p>Пришлите адрес сайта. Посмотрим текущую структуру и обсудим, что можно улучшить в первую очередь.</p></div>
+        <div class="actions"><a class="btn" href="mailto:nikita.nikita.290ch@gmail.com?subject=Хочу%20обновить%20сайт&body=Сайт:%20">Отправить сайт</a><a class="btn secondary" href="https://t.me/YPADS">Telegram</a></div>
+      </div>
+    </section>
+
+    <section id="contacts">
+      <div class="wrap">
+        <div class="sectionHead"><h2>Связаться</h2><p>Можно написать удобным способом. Отвечает Никита.</p></div>
+        <div class="contacts">
+          <a class="contactCard" href="mailto:nikita.nikita.290ch@gmail.com"><small>Email</small><b>nikita.nikita.290ch@gmail.com</b></a>
+          <a class="contactCard" href="https://t.me/YPADS"><small>Telegram</small><b>@YPADS</b></a>
+          <a class="contactCard" href="https://wa.me/79144051747"><small>WhatsApp</small><b>+7 914 405-17-47</b></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap foot"><span>© 2026 YPADS Studio</span><span>Редизайн и разработка сайтов для бизнеса</span></div></footer>
+</body>
+</html>
